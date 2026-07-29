@@ -15,7 +15,8 @@
     "postbuild": "next-sitemap",
     "validate:structure": "node scripts/validate-project.mjs",
     "vercel-build": "prisma generate && prisma migrate deploy && next build && next-sitemap",
-    "check:security": "node scripts/check-security-invariants.mjs"
+    "check:security": "node scripts/check-security-invariants.mjs",
+    "db:clean": "tsx prisma/clean-production.ts"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"
