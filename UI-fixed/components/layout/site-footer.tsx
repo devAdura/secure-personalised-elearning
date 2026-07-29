@@ -1,0 +1,6 @@
+import Link from "next/link";
+import { Logo } from "@/components/layout/logo";
+
+export function SiteFooter() {
+  return <footer className="border-t border-white/70 bg-white/90"><div className="page-container grid gap-8 py-10 md:grid-cols-3"><div><Logo /><p className="mt-4 max-w-sm text-sm text-muted-foreground">A secure collaborative e-learning prototype integrating passkeys, biometric assurance scoring, privacy controls, and personalised recommendations.</p></div><div><h3 className="font-semibold">Platform</h3><div className="mt-3 grid gap-2 text-sm text-muted-foreground"><Link href="/courses">Courses</Link><Link href="/assurance">Assurance center</Link><Link href="/about">About the project</Link><Link href="/contact">Contact</Link></div></div><div><h3 className="font-semibold">Free-first biometrics</h3><p className="mt-3 text-sm text-muted-foreground">Fingerprint verification stays on the device or local simulator. SecureLearn stores public credential metadata and audit evidence, not raw prints.</p></div></div><div className="border-t border-white/70 py-5 text-center text-xs text-muted-foreground">© {new Date().getFullYear()} SecureLearn. Final year Computer Science project.</div></footer>;
+}

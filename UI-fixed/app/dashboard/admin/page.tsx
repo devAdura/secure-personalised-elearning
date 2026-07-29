@@ -1,0 +1,12 @@
+import Link from "next/link";
+import { BookOpen, FileText, ShieldCheck, Users } from "lucide-react";
+import { requireUser } from "@/lib/auth";
+import { db } from "@/lib/db";
+import { formatDateTime } from "@/lib/utils";
+import { DashboardShell } from "@/components/layout/dashboard-shell";
+import { StatCard } from "@/components/dashboard/stat-card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { buttonVariants } from "@/components/ui/button";
+
+export default async function AdminDashboard(){const user=await requireUser(["ADMIN"]);const[userCount,courseCount,assignmentCount,failedCount,logs]=await Promise.all([db.user.count(),db.course.count(),db.assignment.count(),db.securityLog.count({where:{status:"FAILURE",createdAt:{gte:new Date(Date.now()-24*60*60*1000)}}}),db.securityLog.findMany({include:{user:{select:{name:true,email:true}}},orderBy:{createdAt:"desc"},take:10})]);return <DashboardShell user={user}><div className="space-y-8"><div><h1 className="text-3xl font-bold">Administrator dashboard</h1><p className="mt-2 text-muted-foreground">Manage platform records and monitor security-sensitive activity.</p></div><div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4"><StatCard label="Users" value={userCount} icon={Users}/><StatCard label="Courses" value={courseCount} icon={BookOpen}/><StatCard label="Assignments" value={assignmentCount} icon={FileText}/><StatCard label="Failed events (24h)" value={failedCount} icon={ShieldCheck}/></div><Card><CardHeader className="flex-row items-center justify-between"><CardTitle>Recent security logs</CardTitle><Link href="/admin/security-logs" className={buttonVariants({variant:"outline",size:"sm"})}>View all</Link></CardHeader><CardContent><div className="overflow-x-auto"><table className="w-full text-left text-sm"><thead><tr className="border-b text-xs uppercase text-muted-foreground"><th className="py-3">Action</th><th>User</th><th>Status</th><th>IP address</th><th>Time</th></tr></thead><tbody>{logs.map(log=><tr key={log.id} className="border-b last:border-0"><td className="py-3 font-medium">{log.action}</td><td>{log.user?.name||"Guest/System"}</td><td><Badge variant={log.status==="SUCCESS"?"success":log.status==="FAILURE"?"danger":"warning"}>{log.status}</Badge></td><td className="text-muted-foreground">{log.ipAddress}</td><td className="text-muted-foreground">{formatDateTime(log.createdAt)}</td></tr>)}</tbody></table></div></CardContent></Card></div></DashboardShell>}
