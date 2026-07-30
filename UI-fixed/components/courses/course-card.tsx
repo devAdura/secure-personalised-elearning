@@ -4,17 +4,19 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
 
+export type CourseListItem = {
+  id: string;
+  title: string;
+  description: string;
+  category: string;
+  level: string;
+  thumbnailUrl?: string | null;
+  lecturer: { name: string };
+  _count?: { enrollments: number };
+};
+
 type CourseCardProps = {
-  course: {
-    id: string;
-    title: string;
-    description: string;
-    category: string;
-    level: string;
-    thumbnailUrl?: string | null;
-    lecturer: { name: string };
-    _count?: { enrollments: number };
-  };
+  course: CourseListItem;
 };
 
 export function CourseCard({ course }: CourseCardProps) {

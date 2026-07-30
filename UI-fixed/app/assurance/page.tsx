@@ -5,7 +5,7 @@ import { SiteHeader } from "@/components/layout/site-header";
 
 export const metadata: Metadata = {
   title: "Biometric Assurance Center",
-  description: "Literature-backed biometric assurance, privacy, and audit controls for SecureLearn."
+  description: "Biometric assurance, privacy, and audit controls for SecureLearn."
 };
 
 export default function AssurancePage() {

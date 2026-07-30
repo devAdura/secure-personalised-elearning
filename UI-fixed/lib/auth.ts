@@ -3,6 +3,7 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import type { Role } from "@prisma/client";
 import { db } from "@/lib/db";
+import { isPrismaConnectionError, isSupabaseDatabaseConfigured } from "@/lib/demo-courses";
 
 const COOKIE_NAME = process.env.SESSION_COOKIE_NAME || "secure_learning_session";
 const SESSION_DAYS = Number(process.env.SESSION_TTL_DAYS || 7);
@@ -36,15 +37,22 @@ export async function deleteSession() {
 export async function getCurrentUser() {
   const token = (await cookies()).get(COOKIE_NAME)?.value;
   if (!token) return null;
+  if (!isSupabaseDatabaseConfigured()) return null;
 
-  const session = await db.session.findUnique({
-    where: { tokenHash: hashToken(token) },
-    include: {
-      user: {
-        include: { webAuthnCredentials: { select: { id: true, createdAt: true, lastUsedAt: true } } }
+  let session;
+  try {
+    session = await db.session.findUnique({
+      where: { tokenHash: hashToken(token) },
+      include: {
+        user: {
+          include: { webAuthnCredentials: { select: { id: true, createdAt: true, lastUsedAt: true } } }
+        }
       }
-    }
-  });
+    });
+  } catch (error) {
+    if (isPrismaConnectionError(error)) return null;
+    throw error;
+  }
 
   if (!session || session.expiresAt <= new Date() || !session.user.isActive) {
     if (session) await db.session.delete({ where: { id: session.id } });

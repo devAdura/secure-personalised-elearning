@@ -84,7 +84,7 @@ export const literatureInsights = [
 export const freeFirstStack = [
   { layer: "Runtime", choice: "Next.js on Node.js", paidService: "None required" },
   { layer: "Biometrics", choice: "WebAuthn plus local simulated fingerprint evidence", paidService: "None required" },
-  { layer: "Data", choice: "PostgreSQL compatible Prisma schema; local Docker supported", paidService: "Free local or free-tier host" },
+  { layer: "Data", choice: "Supabase Postgres through Prisma pooled runtime and direct migration URLs", paidService: "Existing Supabase plan" },
   { layer: "Personalization", choice: "Transparent scoring from enrolment, activity, pace, and privacy settings", paidService: "None required" },
   { layer: "Audit", choice: "Hash-chained security log evidence", paidService: "None required" }
 ];

@@ -17,7 +17,7 @@ import {
 import { SiteFooter } from "@/components/layout/site-footer";
 import { SiteHeader } from "@/components/layout/site-header";
 import { buttonVariants } from "@/components/ui/button";
-import { assurancePolicy, freeFirstStack, literatureInsights } from "@/lib/biometric-assurance";
+import { assurancePolicy } from "@/lib/biometric-assurance";
 
 const workstreams = [
   { icon: Fingerprint, label: "Passkey assurance", value: "AAL3", detail: "Origin-bound proof with liveness scoring" },
@@ -31,6 +31,36 @@ const workflows = [
   "Adaptive learning paths based on enrolment, pace, and activity",
   "Verified collaboration rooms for discussions, submissions, and review",
   "Instructor security console with liveness and policy evidence"
+];
+
+const operationalControls = [
+  {
+    title: "Protected course actions",
+    metric: "Step-up ready",
+    detail: "Exam unlocks, submissions, peer review signatures, and policy edits can request fresh biometric assurance."
+  },
+  {
+    title: "Privacy-aware learning",
+    metric: "Consent-led",
+    detail: "Personalization uses transparent learner signals and keeps sensitive biometric evidence out of course records."
+  },
+  {
+    title: "Instructor confidence",
+    metric: "AAL scoring",
+    detail: "Lecturers can see whether a high-risk action was granted, blocked, or routed for extra proof."
+  },
+  {
+    title: "Audit-ready reviews",
+    metric: "Hash sealed",
+    detail: "Important learning events carry tamper-evident hashes for exam and moderation workflows."
+  }
+];
+
+const trustControls = [
+  { layer: "Identity", choice: "Passkey-bound access with liveness scoring", status: "Active" },
+  { layer: "Courses", choice: "Published catalogue with offline demo fallback", status: "Resilient" },
+  { layer: "Personalization", choice: "Cohort and local activity signals with consent controls", status: "Adjustable" },
+  { layer: "Audit", choice: "Hash-linked evidence for protected academic actions", status: "Sealed" }
 ];
 
 export default function HomePage() {
@@ -123,14 +153,14 @@ export default function HomePage() {
         <section className="page-container section-padding">
           <div className="evidence-grid">
             <div>
-              <p className="kicker">Literature-backed controls</p>
-              <h2>Research themes are visible in the product, not hidden in a report.</h2>
+              <p className="kicker">Operational assurance</p>
+              <h2>Trust decisions stay visible where students collaborate, submit, and unlock assessments.</h2>
             </div>
-            {literatureInsights.slice(0, 4).map((insight) => (
-              <article className="evidence-card" key={insight.theme}>
-                <strong>{insight.theme}</strong>
-                <span>{insight.papers} papers sampled</span>
-                <p>{insight.productResponse}</p>
+            {operationalControls.map((control) => (
+              <article className="evidence-card" key={control.title}>
+                <strong>{control.title}</strong>
+                <span>{control.metric}</span>
+                <p>{control.detail}</p>
               </article>
             ))}
           </div>
@@ -138,15 +168,15 @@ export default function HomePage() {
 
         <section className="page-container free-band">
           <div>
-            <p className="kicker">Free-first implementation</p>
-            <h2>No paid biometric provider, AI API, blockchain host, or proprietary course service is required.</h2>
+            <p className="kicker">Trust controls</p>
+            <h2>SecureLearn keeps identity, course access, personalization, and audit evidence readable.</h2>
           </div>
           <div className="free-grid">
-            {freeFirstStack.map((item) => (
+            {trustControls.map((item) => (
               <article key={item.layer}>
                 <strong>{item.layer}</strong>
                 <span>{item.choice}</span>
-                <em>{item.paidService}</em>
+                <em>{item.status}</em>
               </article>
             ))}
           </div>

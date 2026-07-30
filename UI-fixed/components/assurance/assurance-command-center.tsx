@@ -4,7 +4,6 @@ import type { CSSProperties } from "react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { LucideIcon } from "lucide-react";
 import {
-  Activity,
   CheckCircle2,
   Download,
   Fingerprint,
@@ -19,8 +18,6 @@ import {
   assurancePolicy,
   assuranceScenarios,
   evaluateAssurance,
-  freeFirstStack,
-  literatureInsights,
   sealAudit,
   seedAudit,
   type AssuranceInput
@@ -212,21 +209,6 @@ export function AssuranceCommandCenter() {
           </div>
         </section>
 
-        <section className="command-panel literature-panel">
-          <PanelHeading icon={Activity} label="Literature synthesis" title="Research translated into app behavior" />
-          <div className="literature-grid">
-            {literatureInsights.map((insight) => (
-              <article key={insight.theme} className="literature-row">
-                <div>
-                  <strong>{insight.theme}</strong>
-                  <span>{insight.papers} papers sampled - {insight.sources.slice(0, 2).join(", ")}</span>
-                </div>
-                <p>{insight.productResponse}</p>
-              </article>
-            ))}
-          </div>
-        </section>
-
         <section className="command-panel audit-panel">
           <PanelHeading icon={KeyRound} label="Tamper evidence" title="Hash-chained audit trail" />
           <div className="audit-ledger">
@@ -242,19 +224,6 @@ export function AssuranceCommandCenter() {
                   <small>prev {entry.previous.slice(0, 8)}</small>
                 </div>
                 <em>{entry.status}</em>
-              </article>
-            ))}
-          </div>
-        </section>
-
-        <section className="command-panel stack-panel">
-          <PanelHeading icon={ShieldCheck} label="Free-first stack" title="No paid service lock-in" />
-          <div className="stack-list">
-            {freeFirstStack.map((item) => (
-              <article key={item.layer}>
-                <strong>{item.layer}</strong>
-                <span>{item.choice}</span>
-                <em>{item.paidService}</em>
               </article>
             ))}
           </div>
