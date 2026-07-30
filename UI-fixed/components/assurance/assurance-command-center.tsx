@@ -294,7 +294,14 @@ function TrustSignalCanvas({ score, decision }: { score: number; decision: strin
     return () => cancelAnimationFrame(raf);
   }, [decision, score]);
 
-  return <canvas ref={canvasRef} width={520} height={420} />;
+  const tone = decision === "BLOCKED" ? "226, 82, 98" : decision === "STEP_UP_REQUIRED" ? "224, 161, 64" : "24, 148, 124";
+
+  return (
+    <>
+      <canvas ref={canvasRef} width={520} height={420} />
+      <div className="trust-signal-fallback" style={{ "--tone": tone, "--score": score } as CSSProperties} aria-hidden="true" />
+    </>
+  );
 }
 
 function Metric({ label, value, detail, tone }: { label: string; value: string | number; detail: string; tone: string }) {
