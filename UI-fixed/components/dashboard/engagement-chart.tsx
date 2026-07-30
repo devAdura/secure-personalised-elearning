@@ -1,3 +1,0 @@
-"use client";
-import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
-export function EngagementChart({data}:{data:{name:string;students:number;submissions:number}[]}){return <div className="h-72 w-full"><ResponsiveContainer width="100%" height="100%"><BarChart data={data}><CartesianGrid strokeDasharray="3 3" vertical={false}/><XAxis dataKey="name" tick={{fontSize:12}}/><YAxis allowDecimals={false} tick={{fontSize:12}}/><Tooltip/><Bar dataKey="students" fill="#1d4ed8" radius={[6,6,0,0]}/><Bar dataKey="submissions" fill="#16a34a" radius={[6,6,0,0]}/></BarChart></ResponsiveContainer></div>}

@@ -1,8 +1,8 @@
-# SecureLearn UI-fixed Redesign Notes
+# SecureLearn Redesign Notes
 
 ## Scope
 
-The root project is preserved as the before version. `UI-fixed` is the revised SecureLearn project that integrates BioLearn Synth's biometric assurance ideas and applies the premium SaaS redesign pass.
+This revised SecureLearn project integrates BioLearn Synth's biometric assurance ideas and applies the premium SaaS redesign pass directly to the main app.
 
 This follow-up pass applies the design system across the full app surface: public marketing/project routes, course catalogue and detail pages, auth/onboarding, student dashboards, lecturer management, admin tables, profile, notifications, passkey setup, loading, not-found, and error states.
 
@@ -50,7 +50,7 @@ Live Awwwards retrieval was limited in the local environment, so the implementat
 ## Verification targets
 
 - Original app: root SecureLearn project.
-- Redesigned app: `UI-fixed`.
+- Redesigned app: repository root.
 - Intended preview ports: original `4300`, redesigned `4301`.
 - Checks: structure validation, security invariant script, TypeScript, build where local environment allows.
 - Browser QA: desktop, tablet, and mobile screenshots with Playwright.

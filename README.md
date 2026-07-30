@@ -2,7 +2,18 @@
 
 ## Securing and Personalising Collaborative E-Learning with Fingerprint Biometrics
 
-SecureLearn is a complete final-year undergraduate Computer Science project prototype built with Next.js, TypeScript, Tailwind CSS, Prisma, PostgreSQL and WebAuthn passkeys. It demonstrates secure role-based e-learning for students, lecturers and administrators.
+This revision integrates BioLearn Synth's biometric assurance ideas and applies a premium SaaS redesign workflow to the main SecureLearn app.
+
+### Revision highlights
+
+- Added `/assurance`, a biometric assurance command center with risk simulation, sequential fingerprint proof, privacy controls and audit-chain evidence.
+- Added shared assurance logic in `lib/biometric-assurance.ts`.
+- Added API endpoints for assurance evaluation and audit-chain verification.
+- Redesigned the public home page into an operational SecureLearn trust console.
+- Redesigned the dashboard shell and metric cards for a premium SaaS command-center feel.
+- Kept the implementation free-first: no paid biometric provider, AI API, blockchain host, image service or proprietary course service.
+
+SecureLearn is a complete final-year undergraduate Computer Science project prototype built with Next.js, TypeScript, Tailwind CSS, Prisma, Supabase Postgres and WebAuthn passkeys. It demonstrates secure role-based e-learning for students, lecturers and administrators.
 
 The project deliberately does **not** store raw fingerprints, fingerprint templates or any biometric data. Fingerprint or device verification happens locally on the user's phone or computer. The server receives only a cryptographic WebAuthn response.
 
@@ -58,7 +69,7 @@ The project deliberately does **not** store raw fingerprints, fingerprint templa
 - Next.js App Router and TypeScript
 - React and Tailwind CSS
 - shadcn-style reusable UI components
-- Prisma ORM and PostgreSQL
+- Prisma ORM and Supabase Postgres
 - `@simplewebauthn/server` and `@simplewebauthn/browser`
 - Zod validation
 - bcrypt password hashing
@@ -98,7 +109,7 @@ lib/
   validators.ts                Zod schemas
   webauthn.ts                  WebAuthn relying-party configuration
 prisma/
-  schema.prisma                PostgreSQL data model
+  schema.prisma                Supabase Postgres data model
   seed.ts                      Demonstration data and accounts
 public/
 middleware.ts                  Initial protected-route cookie check
@@ -108,7 +119,7 @@ middleware.ts                  Initial protected-route cookie check
 
 - Node.js 20 or newer
 - npm 10 or newer
-- PostgreSQL 15 or newer, or a hosted PostgreSQL provider
+- An active Supabase project with its Postgres database password
 - A WebAuthn-capable browser and device authenticator
 
 WebAuthn works on `localhost` during development. Production passkey authentication requires HTTPS and correct relying-party domain settings.
@@ -127,13 +138,11 @@ cd secure-personalised-elearning
 npm install
 ```
 
-### 3. Start PostgreSQL
+### 3. Prepare Supabase Database
 
-You may use an existing PostgreSQL database or the included Docker Compose file:
+SecureLearn uses Supabase Postgres for all application persistence. In the Supabase dashboard, reactivate or create a project, then copy the database password and connection details from **Project Settings -> Database**.
 
-```bash
-docker compose up -d
-```
+Use the pooled connection for `DATABASE_URL` and the direct connection for `DIRECT_URL`.
 
 ### 4. Create the environment file
 
@@ -149,10 +158,11 @@ macOS/Linux:
 cp .env.example .env
 ```
 
-The default local database URL already matches the Docker Compose service:
+Fill in the Supabase values:
 
 ```env
-DATABASE_URL="postgresql://postgres:postgres@localhost:5432/secure_learning?schema=public"
+DATABASE_URL="postgresql://postgres.<PROJECT_REF>:<DB_PASSWORD>@aws-0-<REGION>.pooler.supabase.com:6543/postgres?pgbouncer=true&connection_limit=1"
+DIRECT_URL="postgresql://postgres:<DB_PASSWORD>@db.<PROJECT_REF>.supabase.co:5432/postgres?sslmode=require"
 SESSION_COOKIE_NAME="secure_learning_session"
 SESSION_TTL_DAYS="7"
 NEXT_PUBLIC_APP_URL="http://localhost:3000"
@@ -162,11 +172,15 @@ WEBAUTHN_ORIGIN="http://localhost:3000"
 CBOR_NATIVE_ACCELERATION_DISABLED="true"
 ```
 
-### 5. Generate Prisma Client and migrate
+For example, if your project ref is `aqsefkcbhgsrxbjkuuvp` in `eu-west-3`, the pooled host is `aws-0-eu-west-3.pooler.supabase.com` and the direct host is `db.aqsefkcbhgsrxbjkuuvp.supabase.co`. Replace `<DB_PASSWORD>` with the database password from Supabase.
+
+Do not put a Supabase `service_role` key in `NEXT_PUBLIC_*` variables. This app uses server-side Prisma queries, so the Postgres URLs are the database credentials it needs.
+
+### 5. Generate Prisma Client and apply migrations
 
 ```bash
 npx prisma generate
-npx prisma migrate dev
+npm run prisma:deploy
 ```
 
 ### 6. Seed demonstration data
@@ -255,9 +269,9 @@ git remote add origin https://github.com/YOUR_USERNAME/secure-personalised-elear
 git push -u origin main
 ```
 
-### 2. Create a hosted PostgreSQL database
+### 2. Connect Supabase Database
 
-Create a PostgreSQL database using a provider compatible with Prisma. Copy its connection string into `DATABASE_URL`.
+Use an active Supabase project. In Vercel, set `DATABASE_URL` to the Supabase Transaction Pooler URI and `DIRECT_URL` to the Supabase direct connection URI.
 
 ### 3. Import the repository into Vercel
 
@@ -273,7 +287,8 @@ In the Vercel project settings:
 For a production address such as `https://securelearn.example.com`:
 
 ```env
-DATABASE_URL="YOUR_PRODUCTION_POSTGRESQL_URL"
+DATABASE_URL="postgresql://postgres.<PROJECT_REF>:<DB_PASSWORD>@aws-0-<REGION>.pooler.supabase.com:6543/postgres?pgbouncer=true&connection_limit=1"
+DIRECT_URL="postgresql://postgres:<DB_PASSWORD>@db.<PROJECT_REF>.supabase.co:5432/postgres?sslmode=require"
 SESSION_COOKIE_NAME="secure_learning_session"
 SESSION_TTL_DAYS="7"
 NEXT_PUBLIC_APP_URL="https://securelearn.example.com"
@@ -298,7 +313,7 @@ WEBAUTHN_ORIGIN="https://securelearn-project.vercel.app"
 The supplied Vercel build script runs `prisma migrate deploy`. Seed production only when demonstration data is appropriate:
 
 ```bash
-DATABASE_URL="YOUR_PRODUCTION_URL" npm run prisma:seed
+DATABASE_URL="YOUR_SUPABASE_POOLER_URL" DIRECT_URL="YOUR_SUPABASE_DIRECT_URL" npm run prisma:seed
 ```
 
 Do not repeatedly seed a live production database because the seed resets demonstration records.

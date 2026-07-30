@@ -5,13 +5,13 @@ These prompts are provided for use with ChatGPT, Codex or another coding assista
 ## Prompt 1: Complete local installation on Windows
 
 ```text
-You are working inside my downloaded SecureLearn Next.js project folder. Inspect package.json, .env.example and prisma/schema.prisma. On Windows PowerShell, install dependencies, verify Node and npm versions, start PostgreSQL with docker compose if Docker is available, create .env, run Prisma generate, create the initial migration, seed the database, run type checking, fix any genuine code errors without weakening security, and start npm run dev. Keep WebAuthn configured for localhost. Do not replace WebAuthn with fake biometric storage.
+You are working inside my downloaded SecureLearn Next.js project folder. Inspect package.json, .env.example and prisma/schema.prisma. On Windows PowerShell, install dependencies, verify Node and npm versions, configure .env with my active Supabase `DATABASE_URL` pooler string and `DIRECT_URL` direct string, run Prisma generate, apply the existing migrations with `npm run prisma:deploy`, seed the Supabase database when demonstration data is appropriate, run type checking, fix any genuine code errors without weakening security, and start npm run dev. Keep WebAuthn configured for localhost. Do not replace WebAuthn with fake biometric storage.
 ```
 
 ## Prompt 2: Diagnose npm installation errors
 
 ```text
-Inspect this SecureLearn project and the terminal error I provide. Fix only the package, Node-version, lockfile or configuration issue causing npm install to fail. Preserve Next.js App Router, Prisma PostgreSQL and @simplewebauthn. After the fix, run npm install, npm run typecheck, npm run validate:structure and npm run build. Explain each changed file briefly.
+Inspect this SecureLearn project and the terminal error I provide. Fix only the package, Node-version, lockfile or configuration issue causing npm install to fail. Preserve Next.js App Router, Prisma with Supabase Postgres and @simplewebauthn. After the fix, run npm install, npm run typecheck, npm run validate:structure and npm run build. Explain each changed file briefly.
 ```
 
 ## Prompt 3: Prepare GitHub repository
@@ -23,7 +23,7 @@ Inside this SecureLearn project, verify that .env, node_modules, .next and local
 ## Prompt 4: Deploy to Vercel
 
 ```text
-Prepare this SecureLearn project for Vercel using my final Vercel domain and PostgreSQL connection string. Set NEXT_PUBLIC_APP_URL, WEBAUTHN_ORIGIN and WEBAUTHN_RP_ID correctly for the exact HTTPS domain. Verify the vercel-build script, run Prisma generate and migrate deploy, run a production build, and provide the exact Vercel environment-variable list. Remind me that localhost passkeys must be re-enrolled on the production domain.
+Prepare this SecureLearn project for Vercel using my final Vercel domain and Supabase database connection strings. Set `DATABASE_URL` to the Supabase Transaction Pooler URI and `DIRECT_URL` to the Supabase direct URI. Set NEXT_PUBLIC_APP_URL, WEBAUTHN_ORIGIN and WEBAUTHN_RP_ID correctly for the exact HTTPS domain. Verify the vercel-build script, run Prisma generate and migrate deploy, run a production build, and provide the exact Vercel environment-variable list. Remind me that localhost passkeys must be re-enrolled on the production domain.
 ```
 
 ## Prompt 5: Verify the complete demonstration

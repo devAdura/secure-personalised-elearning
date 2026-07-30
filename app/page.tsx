@@ -1,17 +1,212 @@
 import Link from "next/link";
-import { BookOpen, Fingerprint, LockKeyhole, MessagesSquare, ShieldCheck, Sparkles, Users } from "lucide-react";
-import { SiteHeader } from "@/components/layout/site-header";
+import type { LucideIcon } from "lucide-react";
+import {
+  ArrowRight,
+  BookOpen,
+  CheckCircle2,
+  Fingerprint,
+  Gauge,
+  KeyRound,
+  LockKeyhole,
+  MessagesSquare,
+  Radar,
+  ShieldCheck,
+  Sparkles,
+  Users
+} from "lucide-react";
 import { SiteFooter } from "@/components/layout/site-footer";
+import { SiteHeader } from "@/components/layout/site-header";
 import { buttonVariants } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+import { assurancePolicy } from "@/lib/biometric-assurance";
 
-const features = [
-  { icon: Fingerprint, title: "Fingerprint Login", text: "Use your device fingerprint, face or screen lock through secure WebAuthn passkeys." },
-  { icon: Sparkles, title: "Personalised Learning", text: "Receive practical course recommendations based on your enrolled categories and progress." },
-  { icon: MessagesSquare, title: "Collaborative Courses", text: "Discuss lessons, reply to classmates, access materials and submit assignments in one place." },
-  { icon: ShieldCheck, title: "Secure Access", text: "Role-based permissions, protected routes, login throttling and auditable security events." }
+const workstreams = [
+  { icon: Fingerprint, label: "Passkey assurance", value: "AAL3", detail: "Origin-bound proof with liveness scoring" },
+  { icon: Sparkles, label: "Personalization", value: "1.2", detail: "Privacy-budgeted recommendation signal" },
+  { icon: MessagesSquare, label: "Collaboration", value: "BioSigned", detail: "Peer review and protected study actions" },
+  { icon: ShieldCheck, label: "Audit chain", value: "Valid", detail: "Hash-linked evidence for reviews and exams" }
+];
+
+const workflows = [
+  "Fingerprint/passkey sign-in with no raw biometric storage",
+  "Adaptive learning paths based on enrolment, pace, and activity",
+  "Verified collaboration rooms for discussions, submissions, and review",
+  "Instructor security console with liveness and policy evidence"
+];
+
+const operationalControls = [
+  {
+    title: "Protected course actions",
+    metric: "Step-up ready",
+    detail: "Exam unlocks, submissions, peer review signatures, and policy edits can request fresh biometric assurance."
+  },
+  {
+    title: "Privacy-aware learning",
+    metric: "Consent-led",
+    detail: "Personalization uses transparent learner signals and keeps sensitive biometric evidence out of course records."
+  },
+  {
+    title: "Instructor confidence",
+    metric: "AAL scoring",
+    detail: "Lecturers can see whether a high-risk action was granted, blocked, or routed for extra proof."
+  },
+  {
+    title: "Audit-ready reviews",
+    metric: "Hash sealed",
+    detail: "Important learning events carry tamper-evident hashes for exam and moderation workflows."
+  }
+];
+
+const trustControls = [
+  { layer: "Identity", choice: "Passkey-bound access with liveness scoring", status: "Active" },
+  { layer: "Courses", choice: "Published catalogue with offline demo fallback", status: "Resilient" },
+  { layer: "Personalization", choice: "Cohort and local activity signals with consent controls", status: "Adjustable" },
+  { layer: "Audit", choice: "Hash-linked evidence for protected academic actions", status: "Sealed" }
 ];
 
 export default function HomePage() {
-  return <><SiteHeader /><main><section className="gradient-hero overflow-hidden"><div className="page-container grid min-h-[680px] items-center gap-12 py-16 lg:grid-cols-2"><div><div className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-white px-3 py-1.5 text-sm font-medium text-primary"><LockKeyhole className="h-4 w-4" />Privacy-first biometric security</div><h1 className="mt-6 text-4xl font-bold leading-tight sm:text-5xl lg:text-6xl">Securing and Personalising <span className="text-primary">Collaborative E-Learning</span> with Fingerprint Biometrics</h1><p className="mt-6 max-w-2xl text-lg leading-8 text-muted-foreground">A full-stack academic platform where students learn together, lecturers manage digital courses, and administrators monitor security, all protected by passwords and device-based passkeys.</p><div className="mt-8 flex flex-wrap gap-3"><Link href="/register" className={buttonVariants({ size: "lg" })}>Get Started</Link><Link href="/login" className={buttonVariants({ size: "lg", variant: "outline" })}>Login</Link></div><div className="mt-8 flex flex-wrap gap-5 text-sm text-slate-600"><span className="flex items-center gap-2"><ShieldCheck className="h-4 w-4 text-accent" />No fingerprint data stored</span><span className="flex items-center gap-2"><Users className="h-4 w-4 text-accent" />Three role-based experiences</span></div></div><div className="relative"><div className="absolute -inset-8 rounded-full bg-blue-200/40 blur-3xl" /><div className="relative rounded-3xl border bg-white p-5 shadow-soft"><div className="rounded-2xl bg-slate-950 p-6 text-white"><div className="flex items-center justify-between"><div><p className="text-sm text-slate-300">Student dashboard</p><h2 className="mt-1 text-2xl font-bold">Welcome back, Ada</h2></div><Fingerprint className="h-10 w-10 text-emerald-400" /></div><div className="mt-8 grid grid-cols-3 gap-3"><div className="rounded-xl bg-white/10 p-3"><p className="text-2xl font-bold">4</p><p className="text-xs text-slate-300">Courses</p></div><div className="rounded-xl bg-white/10 p-3"><p className="text-2xl font-bold">2</p><p className="text-xs text-slate-300">Pending</p></div><div className="rounded-xl bg-white/10 p-3"><p className="text-2xl font-bold">8</p><p className="text-xs text-slate-300">Discussions</p></div></div></div><div className="mt-5 grid gap-4 sm:grid-cols-2"><Card><CardContent className="p-5"><BookOpen className="h-6 w-6 text-primary" /><h3 className="mt-4 font-semibold">Continue learning</h3><p className="mt-1 text-sm text-muted-foreground">Introduction to Cybersecurity</p><div className="mt-4 h-2 overflow-hidden rounded-full bg-slate-100"><div className="h-full w-2/3 bg-accent" /></div></CardContent></Card><Card><CardContent className="p-5"><Sparkles className="h-6 w-6 text-amber-500" /><h3 className="mt-4 font-semibold">Recommended</h3><p className="mt-1 text-sm text-muted-foreground">Web Application Security</p><p className="mt-4 text-xs text-primary">Based on your interests</p></CardContent></Card></div></div></div></div></section><section className="section-padding bg-white"><div className="page-container"><div className="mx-auto max-w-2xl text-center"><p className="font-semibold text-primary">Platform capabilities</p><h2 className="mt-2 text-3xl font-bold sm:text-4xl">Secure learning without storing biometric data</h2><p className="mt-4 text-muted-foreground">The platform combines modern learning tools with a clear, defensible WebAuthn security architecture.</p></div><div className="mt-10 grid gap-5 md:grid-cols-2 lg:grid-cols-4">{features.map(({ icon: Icon, title, text }) => <Card key={title} className="border-0 bg-slate-50"><CardContent className="p-6"><span className="inline-grid h-11 w-11 place-items-center rounded-lg bg-primary/10 text-primary"><Icon className="h-5 w-5" /></span><h3 className="mt-5 text-lg font-semibold">{title}</h3><p className="mt-2 text-sm leading-6 text-muted-foreground">{text}</p></CardContent></Card>)}</div></div></section><section className="section-padding"><div className="page-container"><div className="rounded-3xl bg-primary px-6 py-12 text-center text-white sm:px-12"><h2 className="text-3xl font-bold">Ready to demonstrate secure collaborative learning?</h2><p className="mx-auto mt-4 max-w-2xl text-blue-100">Create a student or lecturer account, enrol a device passkey, and explore a complete role-based workflow.</p><Link href="/register" className={buttonVariants({ variant: "secondary", size: "lg", className: "mt-7" })}>Create your account</Link></div></div></section></main><SiteFooter /></>;
+  return (
+    <>
+      <SiteHeader />
+      <main>
+        <section className="home-command">
+          <div className="page-container">
+            <div className="home-grid">
+              <div className="home-copy">
+                <p className="kicker"><LockKeyhole className="h-4 w-4" />SecureLearn biometric command center</p>
+                <h1>Securing and personalizing collaborative e-learning with fingerprint biometrics.</h1>
+                <p>
+                  SecureLearn now combines the original LMS with BioLearn Synth assurance logic: passkeys, liveness checks,
+                  privacy-preserving personalization, sequential proof, and tamper-evident assessment records.
+                </p>
+                <div className="home-actions">
+                  <Link href="/assurance" className={buttonVariants({ size: "lg", className: "premium-link" })}>
+                    Open assurance center
+                    <ArrowRight className="h-4 w-4" />
+                  </Link>
+                  <Link href="/register" className={buttonVariants({ size: "lg", variant: "outline" })}>
+                    Create account
+                  </Link>
+                </div>
+              </div>
+
+              <div className="home-console" aria-label="SecureLearn assurance preview">
+                <div className="console-topline">
+                  <div>
+                    <span>Live trust surface</span>
+                    <strong>Student vault - Ada Morgan</strong>
+                  </div>
+                  <span className="status-chip">Trusted</span>
+                </div>
+                <div className="console-fingerprint">
+                  <div className="finger-lines" aria-hidden="true" />
+                  <div className="trust-readout">
+                    <span>Match</span>
+                    <strong>{assurancePolicy.matchThreshold + 6}%</strong>
+                  </div>
+                  <div className="trust-readout">
+                    <span>Liveness</span>
+                    <strong>{assurancePolicy.livenessThreshold + 8}%</strong>
+                  </div>
+                  <div className="trust-readout">
+                    <span>Template distance</span>
+                    <strong>8</strong>
+                  </div>
+                </div>
+                <div className="console-rows">
+                  <ConsoleRow icon={Radar} label="Exam unlock" value="Step-up proof required" />
+                  <ConsoleRow icon={KeyRound} label="Question-set hash" value="0dd191b99183" />
+                  <ConsoleRow icon={Gauge} label="Recommendation engine" value="Cohort + local signals" />
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section className="page-container section-padding">
+          <div className="workstream-grid">
+            {workstreams.map(({ icon: Icon, label, value, detail }) => (
+              <article className="workstream-card" key={label}>
+                <span><Icon className="h-5 w-5" /></span>
+                <p>{label}</p>
+                <strong>{value}</strong>
+                <small>{detail}</small>
+              </article>
+            ))}
+          </div>
+        </section>
+
+        <section className="page-container product-band">
+          <div>
+            <p className="kicker">Integrated learning operations</p>
+            <h2>One improved SecureLearn project: LMS workflows plus biometric assurance.</h2>
+          </div>
+          <div className="workflow-list">
+            {workflows.map((item) => (
+              <p key={item}>
+                <CheckCircle2 className="h-5 w-5" />
+                {item}
+              </p>
+            ))}
+          </div>
+        </section>
+
+        <section className="page-container section-padding">
+          <div className="evidence-grid">
+            <div>
+              <p className="kicker">Operational assurance</p>
+              <h2>Trust decisions stay visible where students collaborate, submit, and unlock assessments.</h2>
+            </div>
+            {operationalControls.map((control) => (
+              <article className="evidence-card" key={control.title}>
+                <strong>{control.title}</strong>
+                <span>{control.metric}</span>
+                <p>{control.detail}</p>
+              </article>
+            ))}
+          </div>
+        </section>
+
+        <section className="page-container free-band">
+          <div>
+            <p className="kicker">Trust controls</p>
+            <h2>SecureLearn keeps identity, course access, personalization, and audit evidence readable.</h2>
+          </div>
+          <div className="free-grid">
+            {trustControls.map((item) => (
+              <article key={item.layer}>
+                <strong>{item.layer}</strong>
+                <span>{item.choice}</span>
+                <em>{item.status}</em>
+              </article>
+            ))}
+          </div>
+        </section>
+
+        <section className="page-container section-padding">
+          <div className="cta-strip">
+            <Users className="h-7 w-7" />
+            <div>
+              <h2>Enter the improved SecureLearn workspace.</h2>
+              <p>Students, lecturers, and administrators share one trust model with role-specific workflows.</p>
+            </div>
+            <div className="home-actions">
+              <Link href="/courses" className={buttonVariants({ variant: "outline" })}><BookOpen className="h-4 w-4" />Courses</Link>
+              <Link href="/login" className={buttonVariants()}><Fingerprint className="h-4 w-4" />Login</Link>
+            </div>
+          </div>
+        </section>
+      </main>
+      <SiteFooter />
+    </>
+  );
+}
+
+function ConsoleRow({ icon: Icon, label, value }: { icon: LucideIcon; label: string; value: string }) {
+  return (
+    <div className="console-row">
+      <Icon className="h-4 w-4" />
+      <span>{label}</span>
+      <strong>{value}</strong>
+    </div>
+  );
 }
