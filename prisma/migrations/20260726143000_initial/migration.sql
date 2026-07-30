@@ -207,3 +207,22 @@ ALTER TABLE "Notification" ADD CONSTRAINT "Notification_userId_fkey" FOREIGN KEY
 ALTER TABLE "SecurityLog" ADD CONSTRAINT "SecurityLog_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 ALTER TABLE "LearningActivity" ADD CONSTRAINT "LearningActivity_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE "LearningActivity" ADD CONSTRAINT "LearningActivity_courseId_fkey" FOREIGN KEY ("courseId") REFERENCES "Course"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- EnableRowLevelSecurity
+-- The app uses server-side Prisma/Postgres credentials. RLS keeps public-schema
+-- tables closed to accidental Supabase Data API access unless explicit policies
+-- are added later.
+ALTER TABLE "User" ENABLE ROW LEVEL SECURITY;
+ALTER TABLE "Session" ENABLE ROW LEVEL SECURITY;
+ALTER TABLE "WebAuthnCredential" ENABLE ROW LEVEL SECURITY;
+ALTER TABLE "WebAuthnChallenge" ENABLE ROW LEVEL SECURITY;
+ALTER TABLE "Course" ENABLE ROW LEVEL SECURITY;
+ALTER TABLE "Enrollment" ENABLE ROW LEVEL SECURITY;
+ALTER TABLE "Material" ENABLE ROW LEVEL SECURITY;
+ALTER TABLE "Assignment" ENABLE ROW LEVEL SECURITY;
+ALTER TABLE "Submission" ENABLE ROW LEVEL SECURITY;
+ALTER TABLE "DiscussionPost" ENABLE ROW LEVEL SECURITY;
+ALTER TABLE "Notification" ENABLE ROW LEVEL SECURITY;
+ALTER TABLE "SecurityLog" ENABLE ROW LEVEL SECURITY;
+ALTER TABLE "LearningActivity" ENABLE ROW LEVEL SECURITY;
+ALTER TABLE "ContactMessage" ENABLE ROW LEVEL SECURITY;
