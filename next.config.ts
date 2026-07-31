@@ -9,6 +9,7 @@ const securityHeaders = [
 ];
 
 const nextConfig: NextConfig = {
+  outputFileTracingRoot: process.cwd(),
   serverExternalPackages: ["@simplewebauthn/server"],
   images: {
     remotePatterns: [{ protocol: "https", hostname: "images.unsplash.com" }]

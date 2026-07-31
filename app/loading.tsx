@@ -1,2 +1,2 @@
 import { Loader2 } from "lucide-react";
-export default function Loading(){return <div className="grid min-h-[60vh] place-items-center"><div className="text-center"><Loader2 className="mx-auto h-8 w-8 animate-spin text-primary"/><p className="mt-3 text-sm text-muted-foreground">Loading secure learning content…</p></div></div>}
+export default function Loading(){return <div className="state-panel"><div className="premium-card w-full max-w-sm p-8 text-center"><span className="loading-mark"><Loader2 className="h-7 w-7 animate-spin"/></span><p className="mt-4 text-sm font-black text-[#12201c]">Loading secure learning content...</p><p className="mt-2 text-xs leading-5 text-muted-foreground">Preparing the latest course and assurance state.</p></div></div>}

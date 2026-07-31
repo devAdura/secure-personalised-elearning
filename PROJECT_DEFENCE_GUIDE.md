@@ -23,7 +23,7 @@ flowchart LR
     Auth[Session and RBAC Layer]
     WebAuthn[WebAuthn Verification]
     Prisma[Prisma ORM]
-    DB[(PostgreSQL)]
+    DB[(Supabase Postgres)]
     Device[Device Authenticator]
 
     Browser --> Routes
@@ -107,7 +107,7 @@ This is appropriate for a final-year prototype because it can be tested with a s
 
 - Passwords are bcrypt-hashed with 12 rounds.
 - Session tokens contain 256 bits of randomness.
-- Only session-token hashes are stored in PostgreSQL.
+- Only session-token hashes are stored in Supabase Postgres.
 - Cookies are HTTP-only, SameSite=Lax and Secure in production.
 - WebAuthn challenges expire after five minutes.
 - WebAuthn requires user verification.

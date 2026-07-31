@@ -16,7 +16,7 @@ The application stores only:
 ## Implemented controls
 
 - Password hashes use bcrypt with 12 rounds.
-- Sessions use random 256-bit tokens; only SHA-256 token hashes are stored in PostgreSQL.
+- Sessions use random 256-bit tokens; only SHA-256 token hashes are stored in Supabase Postgres.
 - Session cookies are HTTP-only, SameSite=Lax and Secure in production.
 - WebAuthn challenges expire after five minutes and are deleted after successful use.
 - WebAuthn registration and authentication require user verification.
