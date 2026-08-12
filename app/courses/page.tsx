@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { BookOpen, Database, Search, ShieldCheck, Users } from "lucide-react";
 import { db } from "@/lib/db";
-import { getDemoCourseCategories, getDemoCourses, isPrismaConnectionError, isSupabaseDatabaseConfigured } from "@/lib/demo-courses";
+import { getDemoCourseCategories, getDemoCourses, isPrismaConnectionError, isRuntimeDatabaseConfigured } from "@/lib/demo-courses";
 import { SiteHeader } from "@/components/layout/site-header";
 import { SiteFooter } from "@/components/layout/site-footer";
 import { CourseCard, type CourseListItem } from "@/components/courses/course-card";
@@ -20,7 +20,7 @@ export default async function CoursesPage({ searchParams }: { searchParams: Prom
   let courses: CourseListItem[];
   let categories: { category: string }[];
 
-  if (!isSupabaseDatabaseConfigured()) {
+  if (!isRuntimeDatabaseConfigured()) {
     isDemoMode = true;
     courses = getDemoCourses({ q, category, level });
     categories = getDemoCourseCategories();

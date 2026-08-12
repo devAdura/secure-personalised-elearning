@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth";
 import { db } from "@/lib/db";
-import { getDemoCourses, isPrismaConnectionError, isSupabaseDatabaseConfigured } from "@/lib/demo-courses";
+import { getDemoCourses, isPrismaConnectionError, isRuntimeDatabaseConfigured } from "@/lib/demo-courses";
 import { courseSchema } from "@/lib/validators";
 import { logSecurityEvent } from "@/lib/security-log";
 import { apiError } from "@/lib/api";
@@ -11,7 +11,7 @@ export async function GET(request: Request) {
   const query = searchParams.get("q") || "";
   const category = searchParams.get("category") || "";
   const level = searchParams.get("level") || "";
-  if (!isSupabaseDatabaseConfigured()) {
+  if (!isRuntimeDatabaseConfigured()) {
     return NextResponse.json(getDemoCourses({ q: query, category, level }), {
       headers: { "X-SecureLearn-Demo-Mode": "true" }
     });

@@ -3,7 +3,7 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import type { Role } from "@prisma/client";
 import { db } from "@/lib/db";
-import { isPrismaConnectionError, isSupabaseDatabaseConfigured } from "@/lib/demo-courses";
+import { isPrismaConnectionError, isRuntimeDatabaseConfigured, withPrismaConnectionRetry } from "@/lib/database-health";
 
 const COOKIE_NAME = process.env.SESSION_COOKIE_NAME || "secure_learning_session";
 const SESSION_DAYS = Number(process.env.SESSION_TTL_DAYS || 7);
@@ -16,7 +16,7 @@ export async function createSession(userId: string) {
   const token = crypto.randomBytes(32).toString("base64url");
   const expiresAt = new Date(Date.now() + SESSION_DAYS * 24 * 60 * 60 * 1000);
 
-  await db.session.create({ data: { userId, tokenHash: hashToken(token), expiresAt } });
+  await withPrismaConnectionRetry(() => db.session.create({ data: { userId, tokenHash: hashToken(token), expiresAt } }));
   const store = await cookies();
   store.set(COOKIE_NAME, token, {
     httpOnly: true,
@@ -30,32 +30,44 @@ export async function createSession(userId: string) {
 export async function deleteSession() {
   const store = await cookies();
   const token = store.get(COOKIE_NAME)?.value;
-  if (token) await db.session.deleteMany({ where: { tokenHash: hashToken(token) } });
+  if (token) {
+    try {
+      await withPrismaConnectionRetry(() => db.session.deleteMany({ where: { tokenHash: hashToken(token) } }), 2);
+    } catch (error) {
+      if (!isPrismaConnectionError(error)) throw error;
+    }
+  }
   store.delete(COOKIE_NAME);
 }
 
 export async function getCurrentUser() {
   const token = (await cookies()).get(COOKIE_NAME)?.value;
   if (!token) return null;
-  if (!isSupabaseDatabaseConfigured()) return null;
+  if (!isRuntimeDatabaseConfigured()) return null;
 
   let session;
   try {
-    session = await db.session.findUnique({
+    session = await withPrismaConnectionRetry(() => db.session.findUnique({
       where: { tokenHash: hashToken(token) },
       include: {
         user: {
           include: { webAuthnCredentials: { select: { id: true, createdAt: true, lastUsedAt: true } } }
         }
       }
-    });
+    }));
   } catch (error) {
     if (isPrismaConnectionError(error)) return null;
     throw error;
   }
 
   if (!session || session.expiresAt <= new Date() || !session.user.isActive) {
-    if (session) await db.session.delete({ where: { id: session.id } });
+    if (session) {
+      try {
+        await withPrismaConnectionRetry(() => db.session.delete({ where: { id: session.id } }), 2);
+      } catch (error) {
+        if (!isPrismaConnectionError(error)) throw error;
+      }
+    }
     return null;
   }
   return session.user;
