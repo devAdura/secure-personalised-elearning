@@ -1,3 +1,5 @@
+import { isRuntimeDatabaseConfigured } from "@/lib/database-health";
+
 export type DemoCourse = {
   id: string;
   title: string;
@@ -90,22 +92,8 @@ export function getDemoCourseById(id: string) {
   return demoCourses.find((course) => course.id === id) ?? null;
 }
 
+export { isPrismaConnectionError, isRuntimeDatabaseConfigured } from "@/lib/database-health";
+
 export function isSupabaseDatabaseConfigured() {
-  const databaseUrl = process.env.DATABASE_URL || "";
-  return /(?:supabase\.co|pooler\.supabase\.com)/i.test(databaseUrl);
-}
-
-export function isPrismaConnectionError(error: unknown) {
-  const message = error instanceof Error ? error.message : String(error);
-  const code =
-    typeof error === "object" && error !== null && "code" in error
-      ? String((error as { code?: unknown }).code ?? "")
-      : "";
-
-  return (
-    code === "P1000" ||
-    code === "P1001" ||
-    code === "P1012" ||
-    /Can't reach database server|ECONNREFUSED|connect ECONNREFUSED|connection refused|Environment variable not found|DATABASE_URL|DIRECT_URL/i.test(message)
-  );
+  return isRuntimeDatabaseConfigured();
 }

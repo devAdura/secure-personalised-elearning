@@ -1,5 +1,6 @@
 import { SecurityStatus } from "@prisma/client";
 import { db } from "@/lib/db";
+import { withPrismaConnectionRetry } from "@/lib/database-health";
 import { getClientInfo } from "@/lib/utils";
 
 export async function logSecurityEvent({
@@ -17,7 +18,7 @@ export async function logSecurityEvent({
 }) {
   const client = request ? getClientInfo(request) : { ipAddress: "system", userAgent: "system" };
   try {
-    await db.securityLog.create({
+    await withPrismaConnectionRetry(() => db.securityLog.create({
       data: {
         userId: userId ?? null,
         action,
@@ -26,8 +27,8 @@ export async function logSecurityEvent({
         userAgent: client.userAgent,
         metadata: metadata ? JSON.parse(JSON.stringify(metadata)) : undefined
       }
-    });
+    }), 2);
   } catch (error) {
-    console.error("Security log failed", error);
+    console.warn("Security log failed", error);
   }
 }

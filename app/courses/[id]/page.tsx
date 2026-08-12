@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import { BookOpen, CalendarClock, Download, FileText, Fingerprint, LockKeyhole, MessagesSquare, ShieldCheck, Users } from "lucide-react";
 import { db } from "@/lib/db";
 import { getCurrentUser } from "@/lib/auth";
-import { getDemoCourseById, isPrismaConnectionError, isSupabaseDatabaseConfigured, type DemoCourse } from "@/lib/demo-courses";
+import { getDemoCourseById, isPrismaConnectionError, isRuntimeDatabaseConfigured, type DemoCourse } from "@/lib/demo-courses";
 import { canAccessCourse } from "@/lib/permissions";
 import { formatDate } from "@/lib/utils";
 import { SiteHeader } from "@/components/layout/site-header";
@@ -24,7 +24,7 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ i
   let isDemoMode = false;
   let summary: CourseSummary | null = null;
 
-  if (!isSupabaseDatabaseConfigured()) {
+  if (!isRuntimeDatabaseConfigured()) {
     summary = getDemoCourseById(id);
     isDemoMode = Boolean(summary);
   } else {

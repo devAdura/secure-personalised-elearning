@@ -5,6 +5,6 @@ export function apiError(error: unknown, fallback = "Something went wrong", stat
   if (error instanceof ZodError) {
     return NextResponse.json({ error: error.issues[0]?.message || fallback }, { status });
   }
-  const message = error instanceof Error ? error.message : fallback;
+  const message = process.env.NODE_ENV === "development" && error instanceof Error ? error.message : fallback;
   return NextResponse.json({ error: message }, { status });
 }
