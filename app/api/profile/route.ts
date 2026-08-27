@@ -8,7 +8,10 @@ export async function PATCH(request: Request) {
   const user = await getCurrentUser();
   if (!user) return NextResponse.json({ error: "Authentication required." }, { status: 401 });
   try {
-    const data = profileSchema.parse(await request.json());
+    const parsed = profileSchema.parse(await request.json());
+    const data: { name: string; avatarUrl?: string | null } = { name: parsed.name };
+    // An empty avatar value means "remove my photo"; store null in that case.
+    if (parsed.avatarUrl !== undefined) data.avatarUrl = parsed.avatarUrl === "" ? null : parsed.avatarUrl;
     await db.user.update({ where: { id: user.id }, data });
     return NextResponse.json({ success: true });
   } catch (error) { return apiError(error, "Profile update failed"); }

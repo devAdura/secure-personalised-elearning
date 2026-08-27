@@ -15,6 +15,9 @@ model User {
   passwordHash        String
   role                Role                 @default(STUDENT)
   isActive            Boolean              @default(true)
+  avatarUrl           String?
+  totpSecret          String?
+  totpEnabled         Boolean              @default(false)
   createdAt           DateTime             @default(now())
   updatedAt           DateTime             @updatedAt
   courses             Course[]             @relation("LecturerCourses")
@@ -139,6 +142,7 @@ model Submission {
   fileUrl      String?
   grade        Float?
   feedback     String?
+  isLate       Boolean    @default(false)
   submittedAt  DateTime   @default(now())
   updatedAt    DateTime   @updatedAt
   assignment   Assignment @relation(fields: [assignmentId], references: [id], onDelete: Cascade)

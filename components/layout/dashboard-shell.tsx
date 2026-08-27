@@ -47,7 +47,7 @@ const roleLinks: Record<Role, { href: string; label: string; icon: typeof Home }
   ]
 };
 
-export function DashboardShell({ user, children }: { user: { name: string; email: string; role: Role }; children: React.ReactNode }) {
+export function DashboardShell({ user, children }: { user: { name: string; email: string; role: Role; avatarUrl?: string | null }; children: React.ReactNode }) {
   return (
     <div className="min-h-screen bg-[hsl(var(--background))]">
       <aside className="fixed inset-y-0 left-0 hidden w-72 border-r border-white/70 bg-white/80 shadow-[0_24px_80px_rgba(18,32,28,0.08)] backdrop-blur-xl lg:block">
@@ -56,8 +56,13 @@ export function DashboardShell({ user, children }: { user: { name: string; email
         </div>
         <div className="p-4">
           <div className="mb-5 rounded-lg border border-emerald-900/10 bg-[#eef8f1] p-4 shadow-sm">
-            <p className="text-sm font-black text-[#12201c]">{user.name}</p>
-            <p className="truncate text-xs text-[#68766e]">{user.email}</p>
+            <div className="flex items-center gap-3">
+              {user.avatarUrl ? <img src={user.avatarUrl} alt={`${user.name} profile photo`} className="h-10 w-10 shrink-0 rounded-full object-cover" /> : null}
+              <div className="min-w-0">
+                <p className="truncate text-sm font-black text-[#12201c]">{user.name}</p>
+                <p className="truncate text-xs text-[#68766e]">{user.email}</p>
+              </div>
+            </div>
             <p className="mt-3 inline-flex rounded-full bg-white px-2.5 py-1 text-xs font-black uppercase tracking-[0.16em] text-[#176b58]">{user.role}</p>
           </div>
           <nav className="space-y-1">
