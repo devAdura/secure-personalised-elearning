@@ -51,6 +51,7 @@ export async function getCurrentUser() {
       where: { tokenHash: hashToken(token) },
       include: {
         user: {
+          omit: { passwordHash: true, totpSecret: true },
           include: { webAuthnCredentials: { select: { id: true, createdAt: true, lastUsedAt: true } } }
         }
       }

@@ -329,9 +329,29 @@
     box-shadow: 0 14px 45px rgba(18, 32, 28, 0.08);
   }
 
+  /* Flex + wrap keeps the search, level filter and Filter button inside the
+     hero's left column at every width, so they never slide under the adjacent
+     assurance/fingerprint graphic (previously overflowed between ~861-1180px). */
   .filter-shell {
-    grid-template-columns: minmax(240px, 1fr) minmax(150px, 190px) minmax(140px, 170px) auto;
+    display: flex;
+    flex-wrap: wrap;
     max-width: 58rem;
+  }
+
+  .filter-shell > * {
+    min-width: 0;
+  }
+
+  .filter-shell > .input-shell {
+    flex: 1 1 260px;
+  }
+
+  .filter-shell > .select-control {
+    flex: 1 1 170px;
+  }
+
+  .filter-shell > button {
+    flex: 0 0 auto;
   }
 
   .data-toolbar {

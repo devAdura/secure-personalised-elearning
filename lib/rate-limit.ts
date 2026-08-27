@@ -1,7 +1,7 @@
 import { db } from "@/lib/db";
 import { isPrismaConnectionError, withPrismaConnectionRetry } from "@/lib/database-health";
 
-export async function assertLoginAllowed(ipAddress: string) {
+export async function assertLoginAllowed(ipAddress: string, actions: string[] = ["LOGIN_PASSWORD"]) {
   const since = new Date(Date.now() - 15 * 60 * 1000);
   let attempts = 0;
 
@@ -9,7 +9,7 @@ export async function assertLoginAllowed(ipAddress: string) {
     attempts = await withPrismaConnectionRetry(() =>
       db.securityLog.count({
         where: {
-          action: "LOGIN_PASSWORD",
+          action: { in: actions },
           status: "FAILURE",
           ipAddress,
           createdAt: { gte: since }
