@@ -18,16 +18,16 @@ for (const required of ["httpOnly: true", "sameSite: \"lax\"", "tokenHash", "ran
 }
 
 // The TOTP secret must never leave the server via the shared getCurrentUser read.
-if (!auth.includes("totpSecret: true")) {
-  console.error("Missing MFA invariant: getCurrentUser must omit totpSecret");
+if (auth.includes("totpSecretEncrypted")) {
+  console.error("Missing MFA invariant: getCurrentUser must not select totpSecretEncrypted");
   process.exit(1);
 }
 
-// The stateless MFA login ticket must be HMAC-signed and compared in constant time.
-const mfa = fs.readFileSync("lib/mfa.ts", "utf8");
-for (const required of ["createHmac", "timingSafeEqual"]) {
+// TOTP secrets are encrypted at rest and login challenges are compared in constant time.
+const mfa = fs.readFileSync("lib/totp.ts", "utf8");
+for (const required of ["createCipheriv", "createDecipheriv", "timingSafeEqual", "hashMfaChallengeToken"]) {
   if (!mfa.includes(required)) {
-    console.error(`Missing MFA ticket invariant: ${required}`);
+    console.error(`Missing MFA invariant: ${required}`);
     process.exit(1);
   }
 }

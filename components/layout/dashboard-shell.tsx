@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import {
   Bell,
   BookOpen,
@@ -23,7 +24,7 @@ const roleLinks: Record<Role, { href: string; label: string; icon: typeof Home }
     { href: "/courses", label: "Browse Courses", icon: BookOpen },
     { href: "/notifications", label: "Notifications", icon: Bell },
     { href: "/profile", label: "Profile", icon: Settings },
-    { href: "/passkey-setup", label: "Passkey Security", icon: Fingerprint }
+    { href: "/passkey-setup", label: "Security & MFA", icon: Fingerprint }
   ],
   LECTURER: [
     { href: "/dashboard/lecturer", label: "Dashboard", icon: Home },
@@ -33,7 +34,7 @@ const roleLinks: Record<Role, { href: string; label: string; icon: typeof Home }
     { href: "/courses", label: "Course Directory", icon: GraduationCap },
     { href: "/notifications", label: "Notifications", icon: Bell },
     { href: "/profile", label: "Profile", icon: Settings },
-    { href: "/passkey-setup", label: "Passkey Security", icon: Fingerprint }
+    { href: "/passkey-setup", label: "Security & MFA", icon: Fingerprint }
   ],
   ADMIN: [
     { href: "/dashboard/admin", label: "Dashboard", icon: Home },
@@ -43,11 +44,11 @@ const roleLinks: Record<Role, { href: string; label: string; icon: typeof Home }
     { href: "/admin/security-logs", label: "Security Logs", icon: ShieldCheck },
     { href: "/notifications", label: "Notifications", icon: Bell },
     { href: "/profile", label: "Profile", icon: Settings },
-    { href: "/passkey-setup", label: "Passkey Security", icon: Fingerprint }
+    { href: "/passkey-setup", label: "Security & MFA", icon: Fingerprint }
   ]
 };
 
-export function DashboardShell({ user, children }: { user: { name: string; email: string; role: Role; avatarUrl?: string | null }; children: React.ReactNode }) {
+export function DashboardShell({ user, children }: { user: { name: string; email: string; role: Role; avatarDataUrl?: string | null }; children: React.ReactNode }) {
   return (
     <div className="min-h-screen bg-[hsl(var(--background))]">
       <aside className="fixed inset-y-0 left-0 hidden w-72 border-r border-white/70 bg-white/80 shadow-[0_24px_80px_rgba(18,32,28,0.08)] backdrop-blur-xl lg:block">
@@ -57,7 +58,9 @@ export function DashboardShell({ user, children }: { user: { name: string; email
         <div className="p-4">
           <div className="mb-5 rounded-lg border border-emerald-900/10 bg-[#eef8f1] p-4 shadow-sm">
             <div className="flex items-center gap-3">
-              {user.avatarUrl ? <img src={user.avatarUrl} alt={`${user.name} profile photo`} className="h-10 w-10 shrink-0 rounded-full object-cover" /> : null}
+              {user.avatarDataUrl ? (
+                <Image src={user.avatarDataUrl} alt={`${user.name} profile photo`} width={40} height={40} className="h-10 w-10 shrink-0 rounded-full object-cover" unoptimized />
+              ) : null}
               <div className="min-w-0">
                 <p className="truncate text-sm font-black text-[#12201c]">{user.name}</p>
                 <p className="truncate text-xs text-[#68766e]">{user.email}</p>

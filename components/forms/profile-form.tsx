@@ -1,89 +1,17 @@
 "use client";
-import { useRef, useState } from "react";
-import { ImagePlus, Trash2, UserCircle } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import Image from "next/image";
+import { useState } from "react";
+import { Camera, Trash2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { SubmitButton } from "@/components/ui/submit-button";
 import { Alert } from "@/components/ui/alert";
 import { Toast } from "@/components/ui/toast";
 
-// Resizes the chosen image to a 256x256 JPEG data URL entirely in the browser,
-// so only a small, sanitised raster payload is ever sent to the server.
-function resizeToDataUrl(file: File): Promise<string> {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onerror = () => reject(new Error("read-failed"));
-    reader.onload = () => {
-      const img = new Image();
-      img.onerror = () => reject(new Error("decode-failed"));
-      img.onload = () => {
-        const size = 256;
-        const canvas = document.createElement("canvas");
-        canvas.width = size;
-        canvas.height = size;
-        const ctx = canvas.getContext("2d");
-        if (!ctx) return reject(new Error("no-canvas"));
-        const scale = Math.max(size / img.width, size / img.height);
-        const w = img.width * scale;
-        const h = img.height * scale;
-        ctx.drawImage(img, (size - w) / 2, (size - h) / 2, w, h);
-        resolve(canvas.toDataURL("image/jpeg", 0.85));
-      };
-      img.src = reader.result as string;
-    };
-    reader.readAsDataURL(file);
-  });
-}
-
-export function ProfileForm({ name, email, avatarUrl }: { name: string; email: string; avatarUrl?: string | null }) {
-  const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
-  const [avatar, setAvatar] = useState<string | null>(avatarUrl ?? null);
-  const fileRef = useRef<HTMLInputElement>(null);
-
-  async function onFile(event: React.ChangeEvent<HTMLInputElement>) {
-    const file = event.target.files?.[0];
-    if (!file) return;
-    if (!file.type.startsWith("image/") || file.type === "image/svg+xml") {
-      setMessage({ type: "error", text: "Please choose a PNG, JPEG or WebP image." });
-      return;
-    }
-    try {
-      setAvatar(await resizeToDataUrl(file));
-      setMessage(null);
-    } catch {
-      setMessage({ type: "error", text: "That image could not be processed. Please try another file." });
-    } finally {
-      if (fileRef.current) fileRef.current.value = "";
-    }
-  }
-
-  async function submit(event: React.FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    setLoading(true);
-    setMessage(null);
-    const form = Object.fromEntries(new FormData(event.currentTarget));
-    const response = await fetch("/api/profile", { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ...form, avatarUrl: avatar ?? "" }) });
-    const result = await response.json();
-    setLoading(false);
-    setMessage(response.ok ? { type: "success", text: "Profile updated successfully." } : { type: "error", text: result.error || "Update failed" });
-  }
-
-  return <form onSubmit={submit} className="space-y-4">{message?.type === "success" ? <Toast message={message.text} onClose={() => setMessage(null)} /> : null}{message?.type === "error" ? <Alert variant="error">{message.text}</Alert> : null}
-    <div className="space-y-2">
-      <Label>Profile photo</Label>
-      <div className="flex items-center gap-4">
-        <span className="grid h-20 w-20 shrink-0 place-items-center overflow-hidden rounded-lg bg-[#eef8f1] text-primary">{avatar ? <img src={avatar} alt="Profile photo preview" className="h-full w-full object-cover" /> : <UserCircle className="h-12 w-12" />}</span>
-        <div className="flex flex-wrap gap-2">
-          <Button type="button" variant="outline" size="sm" onClick={() => fileRef.current?.click()}><ImagePlus className="h-4 w-4" />{avatar ? "Change photo" : "Upload photo"}</Button>
-          {avatar ? <Button type="button" variant="ghost" size="sm" onClick={() => setAvatar(null)}><Trash2 className="h-4 w-4" />Remove</Button> : null}
-        </div>
-        <input ref={fileRef} type="file" accept="image/png,image/jpeg,image/webp" className="hidden" onChange={onFile} />
-      </div>
-      <p className="text-xs text-muted-foreground">PNG, JPEG or WebP. Images are resized to a small square before saving.</p>
-    </div>
-    <div className="space-y-2"><Label htmlFor="name">Full name</Label><Input id="name" name="name" defaultValue={name} required /></div>
-    <div className="space-y-2"><Label>Email address</Label><Input value={email} disabled /><p className="text-xs text-muted-foreground">Email changes are disabled in this prototype to protect credential ownership.</p></div>
-    <SubmitButton loading={loading}>Save profile</SubmitButton></form>;
+export function ProfileForm({ name, email, avatarDataUrl: initialAvatar }: { name: string; email: string; avatarDataUrl?: string | null }) {
+  const [loading,setLoading]=useState(false); const [message,setMessage]=useState<{type:"success"|"error";text:string}|null>(null);
+  const [avatarDataUrl,setAvatarDataUrl]=useState<string|null>(initialAvatar||null);
+  function choosePhoto(event:React.ChangeEvent<HTMLInputElement>){const file=event.target.files?.[0];if(!file)return;if(!["image/jpeg","image/png","image/webp"].includes(file.type)){setMessage({type:"error",text:"Choose a JPG, PNG or WebP image."});return;}if(file.size>750*1024){setMessage({type:"error",text:"Profile picture must be smaller than 750 KB."});return;}const reader=new FileReader();reader.onload=()=>{setAvatarDataUrl(String(reader.result));setMessage(null);};reader.onerror=()=>setMessage({type:"error",text:"The selected image could not be read."});reader.readAsDataURL(file);}
+  async function submit(event:React.FormEvent<HTMLFormElement>){event.preventDefault();setLoading(true);setMessage(null);const formData=new FormData(event.currentTarget);const data={name:formData.get("name"),avatarDataUrl};const response=await fetch("/api/profile",{method:"PATCH",headers:{"Content-Type":"application/json"},body:JSON.stringify(data)});const result=await response.json();setLoading(false);setMessage(response.ok?{type:"success",text:"Profile updated successfully."}:{type:"error",text:result.error||"Update failed"});}
+  return <form onSubmit={submit} className="space-y-5">{message?.type==="success"?<Toast message={message.text} onClose={()=>setMessage(null)}/>:null}{message?.type==="error"?<Alert variant="error">{message.text}</Alert>:null}<div className="flex flex-col gap-4 rounded-lg border border-[#d8e5de] bg-[#f7fbf8] p-4 sm:flex-row sm:items-center"><div className="grid h-24 w-24 shrink-0 place-items-center overflow-hidden rounded-lg bg-white text-primary shadow-sm">{avatarDataUrl?<Image src={avatarDataUrl} alt="Profile picture preview" width={96} height={96} unoptimized className="h-full w-full object-cover"/>:<Camera className="h-9 w-9"/>}</div><div className="min-w-0 flex-1"><p className="font-black text-[#12201c]">Profile picture</p><p className="mt-1 text-xs leading-5 text-muted-foreground">JPG, PNG or WebP, up to 750 KB.</p><div className="mt-3 flex flex-wrap gap-2"><label htmlFor="avatar-upload" className="inline-flex min-h-9 cursor-pointer items-center justify-center gap-2 rounded-md bg-primary px-3 py-2 text-sm font-black text-white"><Camera className="h-4 w-4"/>{avatarDataUrl?"Replace photo":"Upload photo"}</label><input id="avatar-upload" type="file" accept="image/jpeg,image/png,image/webp" className="sr-only" onChange={choosePhoto}/>{avatarDataUrl?<button type="button" onClick={()=>setAvatarDataUrl(null)} className="inline-flex min-h-9 items-center justify-center gap-2 rounded-md border border-red-200 bg-white px-3 py-2 text-sm font-black text-red-700"><Trash2 className="h-4 w-4"/>Remove</button>:null}</div></div></div><div className="space-y-2"><Label htmlFor="name">Full name</Label><Input id="name" name="name" defaultValue={name} required /></div><div className="space-y-2"><Label>Email address</Label><Input value={email} disabled /><p className="text-xs text-muted-foreground">Email changes are disabled to protect credential ownership.</p></div><SubmitButton loading={loading}>Save profile</SubmitButton></form>;
 }

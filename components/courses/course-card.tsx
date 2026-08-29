@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { BookOpen, Users } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -24,7 +25,7 @@ export function CourseCard({ course }: CourseCardProps) {
     <Card className="group overflow-hidden hover:-translate-y-0.5 hover:border-primary/25 hover:shadow-[0_26px_70px_rgba(18,32,28,0.13)]">
       <div className="relative grid h-40 place-items-center overflow-hidden bg-[linear-gradient(135deg,#12201c,#176b58_54%,#e0a140)]">
         <div className="absolute inset-0 opacity-35 [background:repeating-radial-gradient(ellipse_at_center,transparent_0_12px,rgba(255,255,255,.35)_13px_15px)]" />
-        {course.thumbnailUrl ? <img src={course.thumbnailUrl} alt={`${course.title} thumbnail`} className="relative z-10 h-full w-full object-cover" /> : <BookOpen className="relative z-10 h-12 w-12 text-white/78" />}
+        {course.thumbnailUrl ? <Image src={course.thumbnailUrl} alt={`${course.title} thumbnail`} fill sizes="(min-width: 1024px) 33vw, (min-width: 768px) 50vw, 100vw" unoptimized className="relative z-10 object-cover" /> : <BookOpen className="relative z-10 h-12 w-12 text-white/78" />}
         <span className="absolute bottom-3 left-3 z-10 rounded-full border border-white/18 bg-white/14 px-3 py-1 text-xs font-black text-white backdrop-blur-md">
           {course.level}
         </span>

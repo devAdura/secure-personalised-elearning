@@ -7,19 +7,8 @@ import { SubmitButton } from "@/components/ui/submit-button";
 import { Alert } from "@/components/ui/alert";
 import { Toast } from "@/components/ui/toast";
 
-export function SubmissionForm({ assignmentId, existing, isOverdue = false }: { assignmentId: string; existing?: { content: string; fileUrl: string | null } | null; isOverdue?: boolean }) {
-  const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState<{ type: "error" | "success" | "warning"; text: string } | null>(null);
-  async function submit(event: React.FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    setLoading(true);
-    setMessage(null);
-    const data = Object.fromEntries(new FormData(event.currentTarget));
-    const response = await fetch(`/api/assignments/${assignmentId}/submit`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(data) });
-    const result = await response.json();
-    setLoading(false);
-    if (!response.ok) return setMessage({ type: "error", text: result.error || "Submission failed" });
-    setMessage(result.isLate ? { type: "warning", text: "Assignment submitted — marked as late because the due date has passed." } : { type: "success", text: "Assignment submitted successfully." });
-  }
-  return <form onSubmit={submit} className="space-y-4">{isOverdue ? <Alert variant="warning">This assignment is past its due date. You can still submit, but your work will be flagged as <strong>late</strong> for the lecturer.</Alert> : null}{message?.type === "success" ? <Toast message={message.text} onClose={() => setMessage(null)} /> : null}{message?.type === "warning" ? <Alert variant="warning">{message.text}</Alert> : null}{message?.type === "error" ? <Alert variant="error">{message.text}</Alert> : null}<div className="space-y-2"><Label htmlFor="content">Your response</Label><Textarea id="content" name="content" defaultValue={existing?.content} className="min-h-56" required /></div><div className="space-y-2"><Label htmlFor="fileUrl">File link (Google Drive, OneDrive or repository)</Label><Input id="fileUrl" name="fileUrl" type="url" defaultValue={existing?.fileUrl || ""} placeholder="https://..." /></div><SubmitButton loading={loading}>{existing ? "Update submission" : "Submit assignment"}</SubmitButton></form>;
+export function SubmissionForm({ assignmentId, existing, isClosed }: { assignmentId:string; existing?: {content:string;fileUrl:string|null} | null; isClosed:boolean }) {
+  const[loading,setLoading]=useState(false);const[message,setMessage]=useState<{type:"error"|"success";text:string}|null>(null);
+  async function submit(event:React.FormEvent<HTMLFormElement>){event.preventDefault();setLoading(true);setMessage(null);const data=Object.fromEntries(new FormData(event.currentTarget));const response=await fetch(`/api/assignments/${assignmentId}/submit`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(data)});const result=await response.json();setLoading(false);setMessage(response.ok?{type:"success",text:"Assignment submitted successfully."}:{type:"error",text:result.error||"Submission failed"});}
+  return <form onSubmit={submit} className="space-y-4">{isClosed?<Alert variant="error">The submission deadline has passed. You can review your work, but no new submission or update can be sent.</Alert>:null}{message?.type==="success"?<Toast message={message.text} onClose={()=>setMessage(null)}/>:null}{message?.type==="error"?<Alert variant="error">{message.text}</Alert>:null}<div className="space-y-2"><Label htmlFor="content">Your response</Label><Textarea id="content" name="content" defaultValue={existing?.content} className="min-h-56" disabled={isClosed} required /></div><div className="space-y-2"><Label htmlFor="fileUrl">File link (Google Drive, OneDrive or repository)</Label><Input id="fileUrl" name="fileUrl" type="url" defaultValue={existing?.fileUrl||""} placeholder="https://..." disabled={isClosed} /></div>{!isClosed?<SubmitButton loading={loading}>{existing?"Update submission":"Submit assignment"}</SubmitButton>:null}</form>;
 }

@@ -13,15 +13,19 @@ async function main() {
   await prisma.material.deleteMany();
   await prisma.enrollment.deleteMany();
   await prisma.course.deleteMany();
+  await prisma.mfaLoginChallenge.deleteMany();
   await prisma.webAuthnChallenge.deleteMany();
   await prisma.webAuthnCredential.deleteMany();
   await prisma.session.deleteMany();
   await prisma.contactMessage.deleteMany();
   await prisma.user.deleteMany();
 
-  const passwordHash = await bcrypt.hash("Password123!", 12);
+  const [adminPasswordHash, passwordHash] = await Promise.all([
+    bcrypt.hash(process.env.ADMIN_SEED_PASSWORD || "CSC/2022/81197", 12),
+    bcrypt.hash("Password123!", 12)
+  ]);
   const [admin, lecturer, lecturerTwo, student, studentTwo] = await Promise.all([
-    prisma.user.create({ data: { name: "System Administrator", email: "admin@securelearn.test", passwordHash, role: "ADMIN" } }),
+    prisma.user.create({ data: { name: "Olalekan Ayomide David", email: "admin@securelearn.test", passwordHash: adminPasswordHash, role: "ADMIN" } }),
     prisma.user.create({ data: { name: "Dr Grace Okafor", email: "lecturer@securelearn.test", passwordHash, role: "LECTURER" } }),
     prisma.user.create({ data: { name: "Mr David Bello", email: "david@securelearn.test", passwordHash, role: "LECTURER" } }),
     prisma.user.create({ data: { name: "Ada Nwosu", email: "student@securelearn.test", passwordHash, role: "STUDENT" } }),
@@ -119,8 +123,8 @@ async function main() {
   ]});
 
   console.log("Seed complete.");
-  console.log("Demo password for all accounts: Password123!");
-  console.log("Admin: admin@securelearn.test");
+  console.log("Student and lecturer demo password: Password123!");
+  console.log("Admin: Olalekan Ayomide David <admin@securelearn.test>");
   console.log("Lecturer: lecturer@securelearn.test");
   console.log("Student: student@securelearn.test");
 }

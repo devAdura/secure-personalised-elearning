@@ -100,8 +100,11 @@
   }
 
   .route-copy {
+    position: relative;
+    z-index: 2;
     display: grid;
     align-content: center;
+    min-width: 0;
   }
 
   .route-copy h1,
@@ -132,6 +135,8 @@
 
   .hero-terminal {
     position: relative;
+    z-index: 1;
+    isolation: isolate;
     min-height: 22rem;
     overflow: hidden;
     padding: 1rem;
@@ -329,29 +334,12 @@
     box-shadow: 0 14px 45px rgba(18, 32, 28, 0.08);
   }
 
-  /* Flex + wrap keeps the search, level filter and Filter button inside the
-     hero's left column at every width, so they never slide under the adjacent
-     assurance/fingerprint graphic (previously overflowed between ~861-1180px). */
   .filter-shell {
-    display: flex;
-    flex-wrap: wrap;
+    position: relative;
+    z-index: 3;
+    grid-template-columns: minmax(240px, 1fr) minmax(150px, 190px) minmax(140px, 170px) auto;
     max-width: 58rem;
-  }
-
-  .filter-shell > * {
-    min-width: 0;
-  }
-
-  .filter-shell > .input-shell {
-    flex: 1 1 260px;
-  }
-
-  .filter-shell > .select-control {
-    flex: 1 1 170px;
-  }
-
-  .filter-shell > button {
-    flex: 0 0 auto;
+    isolation: isolate;
   }
 
   .data-toolbar {
@@ -1264,7 +1252,13 @@
     }
 
     .hero-terminal {
-      min-height: 18rem;
+      min-height: 0;
+    }
+
+    .hero-terminal > .absolute {
+      position: relative !important;
+      inset: auto !important;
+      margin-top: 0.75rem;
     }
 
     .terminal-row,

@@ -11,19 +11,9 @@ This revision integrates BioLearn Synth's biometric assurance ideas and applies 
 - Added API endpoints for assurance evaluation and audit-chain verification.
 - Redesigned the public home page into an operational SecureLearn trust console.
 - Redesigned the dashboard shell and metric cards for a premium SaaS command-center feel.
+- Added authenticator-app MFA, profile-picture uploads, reversible notification status, spell-checking, and server-enforced assignment deadlines.
+- Extended Administrator User Management with guarded permanent deletion for student and lecturer accounts.
 - Kept the implementation free-first: no paid biometric provider, AI API, blockchain host, image service or proprietary course service.
-
-### Critique-driven enhancements
-
-This iteration also implements the reviewer feedback for the project:
-
-- **Multi-factor authentication** — optional authenticator-app (TOTP) codes as a second step after password login, enrolled from the profile page with a QR code. Passkey login already satisfies strong authentication and skips the extra step.
-- **Profile pictures** — students and lecturers can upload a photo (resized in-browser to a small square and stored as a compact image data URL, no external image service).
-- **Late submissions** — work submitted after the due date is accepted but clearly flagged **Late** to the student and lecturer, with an overdue warning on the submission form.
-- **Notification undo** — marking a notification as read shows an **Undo** action.
-- **Friendlier validation** — form errors are written in plain language (no "string must contain…" jargon).
-- **Spell-check** — assignment and comment text areas enable native browser spell-checking.
-- **Course-directory layout** — the lecturer course filters now wrap responsively instead of overlapping the assurance graphic.
 
 SecureLearn is a complete final-year undergraduate Computer Science project prototype built with Next.js, TypeScript, Tailwind CSS, Prisma, Supabase Postgres and WebAuthn passkeys. It demonstrates secure role-based e-learning for students, lecturers and administrators.
 
@@ -38,7 +28,7 @@ The project deliberately does **not** store raw fingerprints, fingerprint templa
 - Password login with bcrypt hashing
 - Fingerprint/passkey enrolment through WebAuthn
 - Fingerprint/passkey login after enrolment
-- Optional authenticator-app two-factor authentication (TOTP) after password login
+- Optional TOTP multi-factor authentication for password sign-ins
 - HTTP-only, database-backed sessions
 - Role-based route and API protection
 - Lecturer course-ownership validation
@@ -74,6 +64,7 @@ The project deliberately does **not** store raw fingerprints, fingerprint templa
 
 - Platform statistics
 - User filtering and account activation/deactivation
+- Permanent student and lecturer deletion with cascading cleanup and audit evidence
 - Course review and removal
 - Security-log filtering and audit display
 
@@ -178,15 +169,14 @@ DATABASE_URL="postgresql://postgres.<PROJECT_REF>:<DB_PASSWORD>@aws-0-<REGION>.p
 DIRECT_URL="postgresql://postgres:<DB_PASSWORD>@db.<PROJECT_REF>.supabase.co:5432/postgres?sslmode=require"
 SESSION_COOKIE_NAME="secure_learning_session"
 SESSION_TTL_DAYS="7"
-AUTH_SECRET=""
+MFA_ENCRYPTION_KEY="replace-with-at-least-32-random-characters"
+ADMIN_SEED_PASSWORD="CSC/2022/81197"
 NEXT_PUBLIC_APP_URL="http://localhost:3000"
 WEBAUTHN_RP_ID="localhost"
 WEBAUTHN_RP_NAME="Secure Personalised E-Learning"
 WEBAUTHN_ORIGIN="http://localhost:3000"
 CBOR_NATIVE_ACCELERATION_DISABLED="true"
 ```
-
-`AUTH_SECRET` signs the short-lived two-factor login ticket. Leave it blank for local development (a stable key is derived from `DATABASE_URL`); set a long random value in production, e.g. `openssl rand -base64 32`.
 
 For example, if your project ref is `aqsefkcbhgsrxbjkuuvp` in `eu-west-3`, the pooled host is `aws-0-eu-west-3.pooler.supabase.com` and the direct host is `db.aqsefkcbhgsrxbjkuuvp.supabase.co`. Replace `<DB_PASSWORD>` with the database password from Supabase.
 
@@ -205,6 +195,12 @@ npm run prisma:deploy
 npm run prisma:seed
 ```
 
+The full demonstration seed resets application records. To create or update only the requested Administrator account without touching existing data, run:
+
+```bash
+npm run prisma:seed-admin
+```
+
 ### 7. Run the application
 
 ```bash
@@ -215,19 +211,15 @@ Open `http://localhost:3000`.
 
 ## Demo accounts
 
-All seeded accounts use this password:
+| Role | Name | Email | Password |
+|---|---|---|---|
+| Admin | Olalekan Ayomide David | `admin@securelearn.test` | `CSC/2022/81197` |
+| Lecturer | Dr Grace Okafor | `lecturer@securelearn.test` | `Password123!` |
+| Student | Ada Nwosu | `student@securelearn.test` | `Password123!` |
 
-```text
-Password123!
-```
+Passkeys cannot be pre-seeded because the private key must be created inside the user's real device authenticator. Log in with a demo password, open **Security & MFA**, and enrol the current device.
 
-| Role | Email |
-|---|---|
-| Admin | `admin@securelearn.test` |
-| Lecturer | `lecturer@securelearn.test` |
-| Student | `student@securelearn.test` |
-
-Passkeys cannot be pre-seeded because the private key must be created inside the user's real device authenticator. Log in with a demo password, open **Passkey Security**, and enrol the current device.
+Authenticator MFA cannot be pre-seeded because the shared secret must be enrolled in the user's own authenticator app. Open **Security & MFA**, scan the generated QR code, and verify one current 6-digit code. Production deployments must set a stable `MFA_ENCRYPTION_KEY`; changing it invalidates existing authenticator enrolments.
 
 ## How the Biometric Security Works
 
@@ -259,7 +251,7 @@ This rule-based approach is transparent, easy to evaluate and suitable for a pro
 
 ## File handling scope
 
-For a safe and deployment-friendly prototype, materials and submissions accept text plus an optional external file URL, such as Google Drive, OneDrive, GitHub or an institutional repository. Direct binary uploads would require a managed object-storage service, file-size controls, malware scanning and access policies.
+Profile pictures accept a validated JPG, PNG or WebP image up to 750 KB and store it with the user's Supabase Postgres profile record. Course materials and assignment submissions continue to accept text plus an optional external file URL, such as Google Drive, OneDrive, GitHub or an institutional repository.
 
 ## Validation and production build
 
@@ -307,6 +299,8 @@ DATABASE_URL="postgresql://postgres.<PROJECT_REF>:<DB_PASSWORD>@aws-0-<REGION>.p
 DIRECT_URL="postgresql://postgres:<DB_PASSWORD>@db.<PROJECT_REF>.supabase.co:5432/postgres?sslmode=require"
 SESSION_COOKIE_NAME="secure_learning_session"
 SESSION_TTL_DAYS="7"
+MFA_ENCRYPTION_KEY="replace-with-at-least-32-random-characters"
+ADMIN_SEED_PASSWORD="CSC/2022/81197"
 NEXT_PUBLIC_APP_URL="https://securelearn.example.com"
 WEBAUTHN_RP_ID="securelearn.example.com"
 WEBAUTHN_RP_NAME="Secure Personalised E-Learning"
@@ -347,6 +341,7 @@ npm run validate:structure
 npm run prisma:generate
 npm run prisma:migrate
 npm run prisma:seed
+npm run prisma:seed-admin
 npm run build
 npm run vercel-build
 npx prisma studio
@@ -360,7 +355,7 @@ npx prisma studio
 4. Log out and return using the passkey button.
 5. Enrol in a course, view materials, post a discussion reply and submit an assignment.
 6. Log in as the lecturer, create a course or assignment and grade the submission.
-7. Log in as administrator, disable a user and inspect security logs.
+7. Log in as administrator, disable or permanently delete a non-administrator user, and inspect security logs.
 8. Explain the recommendation rules and the database relationships.
 
 ## Limitations and future improvements

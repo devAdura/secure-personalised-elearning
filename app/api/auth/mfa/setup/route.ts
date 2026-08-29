@@ -1,23 +1,28 @@
 import { NextResponse } from "next/server";
 import QRCode from "qrcode";
-import { db } from "@/lib/db";
 import { getCurrentUser } from "@/lib/auth";
-import { generateTotpSecret, totpAuthUrl } from "@/lib/mfa";
+import { db } from "@/lib/db";
 import { apiError } from "@/lib/api";
+import { logSecurityEvent } from "@/lib/security-log";
+import { createTotpSecret, createTotpUri, encryptTotpSecret } from "@/lib/totp";
 
-// Begins authenticator-app enrolment: generates a fresh secret, stores it
-// (still disabled until the user confirms a code), and returns the QR code and
-// manual key for the user to add to their app.
-export async function POST() {
+export const runtime = "nodejs";
+
+export async function POST(request: Request) {
+  const user = await getCurrentUser();
+  if (!user) return NextResponse.json({ error: "Authentication required." }, { status: 401 });
+  if (user.totpEnabled) return NextResponse.json({ error: "Disable the current authenticator before enrolling a replacement." }, { status: 409 });
   try {
-    const user = await getCurrentUser();
-    if (!user) return NextResponse.json({ error: "Authentication required." }, { status: 401 });
-    if (user.totpEnabled) return NextResponse.json({ error: "Two-factor authentication is already enabled." }, { status: 400 });
-
-    const secret = generateTotpSecret();
-    await db.user.update({ where: { id: user.id }, data: { totpSecret: secret, totpEnabled: false } });
-    const otpauthUrl = totpAuthUrl(secret, user.email);
-    const qr = await QRCode.toDataURL(otpauthUrl);
-    return NextResponse.json({ secret, otpauthUrl, qr });
-  } catch (error) { return apiError(error, "Could not start two-factor setup"); }
+    const secret = createTotpSecret();
+    const uri = createTotpUri(secret, user.email);
+    const qrCodeDataUrl = await QRCode.toDataURL(uri, { width: 260, margin: 1, errorCorrectionLevel: "M" });
+    await db.user.update({
+      where: { id: user.id },
+      data: { totpSecretEncrypted: encryptTotpSecret(secret), totpEnabled: false }
+    });
+    await logSecurityEvent({ request, userId: user.id, action: "MFA_SETUP_STARTED", status: "SUCCESS" });
+    return NextResponse.json({ secret, qrCodeDataUrl });
+  } catch (error) {
+    return apiError(error, "Authenticator setup could not be started", 503);
+  }
 }
