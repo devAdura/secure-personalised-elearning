@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Suspense } from "react";
-import { CheckCircle2, Fingerprint, KeyRound, ShieldCheck, Sparkles } from "lucide-react";
+import { Fingerprint, KeyRound, ShieldCheck, Sparkles } from "lucide-react";
 import { LoginForm } from "@/components/auth/login-form";
 import { Logo } from "@/components/layout/logo";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -59,10 +59,6 @@ export default function LoginPage() {
               </Suspense>
               <p className="mt-6 text-center text-sm text-muted-foreground">
                 New to SecureLearn? <Link href="/register" className="font-black text-primary">Create an account</Link>
-              </p>
-              <p className="mt-4 flex items-center justify-center gap-2 text-center text-xs text-muted-foreground">
-                <CheckCircle2 className="h-4 w-4 text-primary" />
-                Demo accounts are documented in the project README.
               </p>
             </CardContent>
           </Card>

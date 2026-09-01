@@ -8,7 +8,7 @@ export function SiteFooter() {
         <div>
           <Logo />
           <p className="mt-4 max-w-sm text-sm leading-6 text-muted-foreground">
-            A secure collaborative e-learning prototype integrating passkeys, assurance scoring, privacy controls, and personalised course recommendations.
+            Secure collaborative e-learning with passkeys, assurance scoring, privacy controls, and personalised course recommendations.
           </p>
         </div>
         <div>
@@ -16,7 +16,7 @@ export function SiteFooter() {
           <div className="mt-3 grid gap-2 text-sm text-muted-foreground">
             <Link href="/courses">Courses</Link>
             <Link href="/assurance">Assurance center</Link>
-            <Link href="/about">About the project</Link>
+            <Link href="/about">About SecureLearn</Link>
             <Link href="/contact">Contact</Link>
           </div>
         </div>
@@ -27,7 +27,7 @@ export function SiteFooter() {
           </p>
         </div>
       </div>
-      <div className="border-t border-white/70 py-5 text-center text-xs text-muted-foreground">© {new Date().getFullYear()} SecureLearn. Final year Computer Science project.</div>
+      <div className="border-t border-white/70 py-5 text-center text-xs text-muted-foreground">© {new Date().getFullYear()} SecureLearn. Secure biometric learning.</div>
     </footer>
   );
 }

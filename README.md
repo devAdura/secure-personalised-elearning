@@ -170,6 +170,9 @@ DIRECT_URL="postgresql://postgres:<DB_PASSWORD>@db.<PROJECT_REF>.supabase.co:543
 SESSION_COOKIE_NAME="secure_learning_session"
 SESSION_TTL_DAYS="7"
 MFA_ENCRYPTION_KEY="replace-with-at-least-32-random-characters"
+BREVO_API_KEY="replace-with-a-brevo-api-key"
+EMAIL_FROM="replace-with-a-verified-sender@example.com"
+EMAIL_FROM_NAME="SecureLearn"
 ADMIN_SEED_PASSWORD="CSC/2022/81197"
 NEXT_PUBLIC_APP_URL="http://localhost:3000"
 WEBAUTHN_RP_ID="localhost"
@@ -220,6 +223,8 @@ Open `http://localhost:3000`.
 Passkeys cannot be pre-seeded because the private key must be created inside the user's real device authenticator. Log in with a demo password, open **Security & MFA**, and enrol the current device.
 
 Authenticator MFA cannot be pre-seeded because the shared secret must be enrolled in the user's own authenticator app. Open **Security & MFA**, scan the generated QR code, and verify one current 6-digit code. Production deployments must set a stable `MFA_ENCRYPTION_KEY`; changing it invalidates existing authenticator enrolments.
+
+Password recovery sends a 6-digit code through Brevo transactional email. A free Brevo account is sufficient for this project: verify a sender address, create an API key, then set `BREVO_API_KEY`, `EMAIL_FROM`, and `EMAIL_FROM_NAME`. Never commit the API key to Git.
 
 ## How the Biometric Security Works
 
@@ -300,6 +305,9 @@ DIRECT_URL="postgresql://postgres:<DB_PASSWORD>@db.<PROJECT_REF>.supabase.co:543
 SESSION_COOKIE_NAME="secure_learning_session"
 SESSION_TTL_DAYS="7"
 MFA_ENCRYPTION_KEY="replace-with-at-least-32-random-characters"
+BREVO_API_KEY="replace-with-a-brevo-api-key"
+EMAIL_FROM="replace-with-a-verified-sender@example.com"
+EMAIL_FROM_NAME="SecureLearn"
 ADMIN_SEED_PASSWORD="CSC/2022/81197"
 NEXT_PUBLIC_APP_URL="https://securelearn.example.com"
 WEBAUTHN_RP_ID="securelearn.example.com"
@@ -360,7 +368,6 @@ npx prisma studio
 
 ## Limitations and future improvements
 
-- Add verified email delivery and password-reset flows.
 - Use distributed rate limiting for multi-instance deployments.
 - Add real object storage with malware scanning for direct uploads.
 - Add richer learning-progress tracking and completion percentages.

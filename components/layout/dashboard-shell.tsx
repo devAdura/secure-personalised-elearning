@@ -1,5 +1,9 @@
+"use client";
+
 import Link from "next/link";
 import Image from "next/image";
+import { useState } from "react";
+import { usePathname } from "next/navigation";
 import {
   Bell,
   BookOpen,
@@ -7,6 +11,8 @@ import {
   Fingerprint,
   GraduationCap,
   Home,
+  Inbox,
+  Menu,
   Radar,
   Settings,
   ShieldCheck,
@@ -42,6 +48,7 @@ const roleLinks: Record<Role, { href: string; label: string; icon: typeof Home }
     { href: "/admin/users", label: "User Management", icon: Users },
     { href: "/admin/courses", label: "Course Management", icon: BookOpen },
     { href: "/admin/security-logs", label: "Security Logs", icon: ShieldCheck },
+    { href: "/admin/messages", label: "Administrator Inbox", icon: Inbox },
     { href: "/notifications", label: "Notifications", icon: Bell },
     { href: "/profile", label: "Profile", icon: Settings },
     { href: "/passkey-setup", label: "Security & MFA", icon: Fingerprint }
@@ -49,6 +56,10 @@ const roleLinks: Record<Role, { href: string; label: string; icon: typeof Home }
 };
 
 export function DashboardShell({ user, children }: { user: { name: string; email: string; role: Role; avatarDataUrl?: string | null }; children: React.ReactNode }) {
+  const pathname = usePathname();
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const links = roleLinks[user.role];
+  const primaryMobileLinks = links.slice(0, 4);
   return (
     <div className="min-h-screen bg-[hsl(var(--background))]">
       <aside className="fixed inset-y-0 left-0 hidden w-72 border-r border-white/70 bg-white/80 shadow-[0_24px_80px_rgba(18,32,28,0.08)] backdrop-blur-xl lg:block">
@@ -87,7 +98,7 @@ export function DashboardShell({ user, children }: { user: { name: string; email
         </div>
       </aside>
       <div className="lg:pl-72">
-        <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b border-white/70 bg-white/90 px-4 shadow-[0_10px_35px_rgba(18,32,28,0.05)] backdrop-blur-xl sm:px-6">
+        <header className="safe-top-header sticky top-0 z-30 flex min-h-16 items-center justify-between gap-3 border-b border-white/70 bg-white/90 px-4 shadow-[0_10px_35px_rgba(18,32,28,0.05)] backdrop-blur-xl sm:px-6">
           <div className="min-w-0">
             <p className="text-xs font-black uppercase tracking-[0.18em] text-[#176b58]">SecureLearn command center</p>
             <p className="mt-1 hidden truncate text-sm text-[#68766e] sm:block">Biometric assurance, collaboration, and adaptive learning.</p>
@@ -103,14 +114,16 @@ export function DashboardShell({ user, children }: { user: { name: string; email
             <LogoutButton />
           </div>
         </header>
-        <main className="pb-24 p-4 sm:p-6 lg:p-8 lg:pb-8">{children}</main>
-        <nav className="fixed inset-x-0 bottom-0 z-40 flex justify-around border-t border-white/70 bg-white/95 p-2 backdrop-blur-xl lg:hidden">
-          {roleLinks[user.role].slice(0, 5).map(({ href, label, icon: Icon }) => (
-            <Link key={href} href={href} className="flex flex-col items-center gap-1 px-2 py-1 text-[10px] font-bold text-[#68766e]">
+        <main className="p-4 pb-28 sm:p-6 sm:pb-28 lg:p-8 lg:pb-8">{children}</main>
+        {mobileMenuOpen?<><button type="button" aria-label="Close navigation menu" className="fixed inset-0 z-40 bg-[#12201c]/35 lg:hidden" onClick={()=>setMobileMenuOpen(false)}/><section className="fixed inset-x-3 z-50 max-h-[70dvh] overflow-y-auto rounded-lg border border-[#d8e5de] bg-white p-3 shadow-[0_24px_80px_rgba(18,32,28,0.24)] lg:hidden" style={{bottom:"calc(4.75rem + env(safe-area-inset-bottom))"}} aria-label="All workspace navigation"><div className="mb-3 flex items-center justify-between px-1"><div><p className="text-sm font-black text-[#12201c]">Workspace navigation</p><p className="text-xs text-muted-foreground">{user.role.charAt(0)+user.role.slice(1).toLowerCase()} account</p></div></div><div className="grid grid-cols-2 gap-2">{links.map(({href,label,icon:Icon})=><Link key={href} href={href} onClick={()=>setMobileMenuOpen(false)} aria-current={pathname===href?"page":undefined} className={cn("flex min-h-16 items-center gap-3 rounded-md border px-3 py-2 text-xs font-black",pathname===href?"border-primary/30 bg-primary/10 text-primary":"border-[#d8e5de] bg-white text-[#405049]")}><Icon className="h-5 w-5 shrink-0"/><span>{label}</span></Link>)}</div></section></>:null}
+        <nav className="mobile-bottom-nav fixed inset-x-0 bottom-0 z-[60] grid grid-cols-5 border-t border-[#d8e5de] bg-white/95 px-1 pt-2 shadow-[0_-10px_35px_rgba(18,32,28,0.08)] backdrop-blur-xl lg:hidden">
+          {primaryMobileLinks.map(({ href, label, icon: Icon }) => (
+            <Link key={href} href={href} aria-current={pathname===href?"page":undefined} className={cn("flex min-w-0 flex-col items-center gap-1 px-1 py-1 text-center text-[10px] font-bold leading-tight",pathname===href?"text-primary":"text-[#68766e]")}>
               <Icon className="h-5 w-5" />
-              {label}
+              <span className="line-clamp-2">{label}</span>
             </Link>
           ))}
+          <button type="button" aria-expanded={mobileMenuOpen} onClick={()=>setMobileMenuOpen((open)=>!open)} className={cn("flex min-w-0 flex-col items-center gap-1 px-1 py-1 text-[10px] font-bold leading-tight",mobileMenuOpen?"text-primary":"text-[#68766e]")}><Menu className="h-5 w-5"/><span>More</span></button>
         </nav>
       </div>
     </div>

@@ -1,9 +1,15 @@
 import { z } from "zod";
 
+export const passwordSchema = z.string()
+  .min(8, "Password must be at least 8 characters")
+  .max(128, "Password is too long")
+  .regex(/[A-Z]/, "Include an uppercase letter")
+  .regex(/[0-9]/, "Include a number");
+
 export const registerSchema = z.object({
   name: z.string().trim().min(2).max(80),
   email: z.string().trim().toLowerCase().email(),
-  password: z.string().min(8).max(128).regex(/[A-Z]/, "Include an uppercase letter").regex(/[0-9]/, "Include a number"),
+  password: passwordSchema,
   role: z.enum(["STUDENT", "LECTURER"])
 });
 
@@ -30,6 +36,17 @@ export const contactSchema = z.object({
 });
 
 export const mfaCodeSchema = z.string().trim().regex(/^\d{6}$/, "Enter the 6-digit code from your authenticator app");
+
+export const passwordResetRequestSchema = z.object({
+  email: z.string().trim().toLowerCase().email("Enter a valid email address")
+});
+
+export const passwordResetConfirmSchema = z.object({
+  email: z.string().trim().toLowerCase().email("Enter a valid email address"),
+  challengeToken: z.string().min(32).max(128),
+  code: z.string().trim().regex(/^\d{6}$/, "Enter the 6-digit code sent to your email"),
+  password: passwordSchema
+});
 
 export const courseSchema = z.object({
   title: z.string().trim().min(3).max(140),

@@ -32,6 +32,18 @@ for (const required of ["createCipheriv", "createDecipheriv", "timingSafeEqual",
   }
 }
 
+// Password reset codes and challenge tokens must be protected at rest and successful resets revoke sessions.
+const passwordReset = [
+  fs.readFileSync("lib/password-reset.ts", "utf8"),
+  fs.readFileSync("app/api/auth/password-reset/confirm/route.ts", "utf8")
+].join("\n");
+for (const required of ["randomInt", "randomBytes(32)", "bcrypt.hash", "hashPasswordResetToken", "session.deleteMany", "consumedAt"]) {
+  if (!passwordReset.includes(required)) {
+    console.error(`Missing password recovery invariant: ${required}`);
+    process.exit(1);
+  }
+}
+
 const webauthn = [
   fs.readFileSync("app/api/auth/passkey/register-options/route.ts", "utf8"),
   fs.readFileSync("app/api/auth/passkey/register-verify/route.ts", "utf8"),

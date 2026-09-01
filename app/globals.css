@@ -40,6 +40,7 @@
   html { scroll-behavior: smooth; }
   body {
     @apply bg-background text-foreground antialiased;
+    overflow-x: clip;
     background:
       linear-gradient(180deg, rgba(255, 255, 255, 0.72), transparent 360px),
       linear-gradient(135deg, #f8faf5 0%, #eff7f3 52%, #f6f0e7 100%);
@@ -50,6 +51,8 @@
 }
 
 @layer components {
+  .safe-top-header { padding-top: env(safe-area-inset-top); }
+  .mobile-bottom-nav { padding-bottom: max(0.5rem, env(safe-area-inset-bottom)); }
   .page-container { @apply mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8; }
   .section-padding { @apply py-16 sm:py-20; }
   .gradient-hero {
@@ -253,12 +256,14 @@
   .auth-story {
     display: grid;
     align-content: center;
+    min-width: 0;
     min-height: 34rem;
     padding: 1rem 0;
   }
 
   .auth-card {
     width: 100%;
+    min-width: 0;
     max-width: 34rem;
     justify-self: end;
     padding: 0.75rem;
@@ -1153,7 +1158,7 @@
     .product-band,
     .free-band,
     .cta-strip {
-      grid-template-columns: 1fr;
+      grid-template-columns: minmax(0, 1fr);
     }
 
     .home-copy h1,

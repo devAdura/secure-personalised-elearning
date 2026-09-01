@@ -9,28 +9,29 @@ datasource db {
 }
 
 model User {
-  id                  String               @id @default(cuid())
-  name                String
-  email               String               @unique
-  passwordHash        String
-  role                Role                 @default(STUDENT)
-  isActive            Boolean              @default(true)
-  avatarDataUrl       String?              @db.Text
-  totpSecretEncrypted String?              @db.Text
-  totpEnabled         Boolean              @default(false)
-  createdAt           DateTime             @default(now())
-  updatedAt           DateTime             @updatedAt
-  courses             Course[]             @relation("LecturerCourses")
-  discussionPosts     DiscussionPost[]
-  enrollments         Enrollment[]
-  activities          LearningActivity[]
-  notifications       Notification[]
-  securityLogs        SecurityLog[]
-  sessions            Session[]
-  submissions         Submission[]
-  challenges          WebAuthnChallenge[]
-  webAuthnCredentials WebAuthnCredential[]
-  mfaLoginChallenges  MfaLoginChallenge[]
+  id                      String                   @id @default(cuid())
+  name                    String
+  email                   String                   @unique
+  passwordHash            String
+  role                    Role                     @default(STUDENT)
+  isActive                Boolean                  @default(true)
+  avatarDataUrl           String?                  @db.Text
+  totpSecretEncrypted     String?                  @db.Text
+  totpEnabled             Boolean                  @default(false)
+  createdAt               DateTime                 @default(now())
+  updatedAt               DateTime                 @updatedAt
+  courses                 Course[]                 @relation("LecturerCourses")
+  discussionPosts         DiscussionPost[]
+  enrollments             Enrollment[]
+  activities              LearningActivity[]
+  notifications           Notification[]
+  securityLogs            SecurityLog[]
+  sessions                Session[]
+  submissions             Submission[]
+  challenges              WebAuthnChallenge[]
+  webAuthnCredentials     WebAuthnCredential[]
+  mfaLoginChallenges      MfaLoginChallenge[]
+  passwordResetChallenges PasswordResetChallenge[]
 }
 
 model MfaLoginChallenge {
@@ -44,6 +45,23 @@ model MfaLoginChallenge {
   user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
+  @@index([expiresAt])
+}
+
+model PasswordResetChallenge {
+  id          String    @id @default(cuid())
+  userId      String
+  tokenHash   String    @unique
+  codeHash    String
+  requestedIp String?
+  attempts    Int       @default(0)
+  expiresAt   DateTime
+  consumedAt  DateTime?
+  createdAt   DateTime  @default(now())
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+  @@index([requestedIp, createdAt])
   @@index([expiresAt])
 }
 
@@ -180,6 +198,7 @@ model DiscussionPost {
   replies   DiscussionPost[] @relation("DiscussionReplies")
 
   @@index([courseId, createdAt])
+  @@index([authorId])
   @@index([parentId])
 }
 

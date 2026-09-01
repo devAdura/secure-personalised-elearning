@@ -50,6 +50,10 @@ function getEncryptionKey() {
   return crypto.createHash("sha256").update(configured || "securelearn-local-development-mfa-key").digest();
 }
 
+export function isMfaEncryptionConfigured() {
+  return Boolean(process.env.MFA_ENCRYPTION_KEY?.trim());
+}
+
 export function createTotpSecret() {
   return base32Encode(crypto.randomBytes(20));
 }

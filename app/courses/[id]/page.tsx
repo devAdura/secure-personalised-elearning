@@ -96,7 +96,7 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ i
               <p>{summary.description}</p>
               {isDemoMode ? (
                 <div className="mt-5 max-w-3xl">
-                  <Alert><strong>Demo course preview.</strong> Live course records are unavailable because Supabase is not reachable. Reactivate the Supabase project and apply the migrations to enrol, unlock materials, and join discussions.</Alert>
+                  <Alert><strong>Limited course preview.</strong> Live course activity is temporarily unavailable. You can still review this sample while the service recovers.</Alert>
                 </div>
               ) : null}
               <div className="mt-6 flex flex-wrap gap-3 text-sm text-muted-foreground">
@@ -112,7 +112,7 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ i
             <aside className="hero-terminal premium-card">
               <div className="terminal-row"><span>Access model</span><strong>{hasAccess ? "Unlocked" : "Protected"}</strong></div>
               <div className="terminal-row"><span>Identity proof</span><strong>{user ? "Session verified" : "Login required"}</strong></div>
-              <div className="terminal-row"><span>Course source</span><strong>{isDemoMode ? "Demo preview" : "Supabase"}</strong></div>
+              <div className="terminal-row"><span>Course state</span><strong>{isDemoMode ? "Limited preview" : "Available"}</strong></div>
               <div className="absolute bottom-4 left-4 right-4 z-10 rounded-lg border border-white/15 bg-white/10 p-4 backdrop-blur-md">
                 <Fingerprint className="h-7 w-7 text-[#b7f0dc]" />
                 <p className="mt-3 text-sm font-bold leading-6 text-white/75">Learning materials, assignments, and discussions stay behind an enrolment and role check.</p>
@@ -174,7 +174,7 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ i
                 </span>
                 <h2 className="mt-5 text-2xl font-black text-[#12201c]">Course content is protected</h2>
                 <p className="mx-auto mt-2 max-w-lg text-sm leading-6 text-muted-foreground">
-                  {isDemoMode ? "This sample course is available for browsing while Supabase is offline. Connect Supabase to enrol and open live materials, assignments and discussions." : "Students must enrol before viewing materials, assignments and discussions. Course lecturers and administrators have authorised access."}
+                  {isDemoMode ? "This sample course remains available for browsing while live course activity recovers. Enrolment, assignments, and discussions may be temporarily unavailable." : "Students must enrol before viewing materials, assignments and discussions. Course lecturers and administrators have authorised access."}
                 </p>
                 <div className="mt-6 flex flex-wrap justify-center gap-2">
                   <Badge variant="outline"><ShieldCheck className="mr-1 h-3.5 w-3.5" />Role checked</Badge>

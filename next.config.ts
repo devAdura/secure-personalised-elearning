@@ -10,7 +10,13 @@ const securityHeaders = [
 
 const nextConfig: NextConfig = {
   outputFileTracingRoot: process.cwd(),
-  serverExternalPackages: ["@simplewebauthn/server"],
+  serverExternalPackages: ["@simplewebauthn/server", "dictionary-en-gb"],
+  outputFileTracingIncludes: {
+    "/api/spellcheck": [
+      "./node_modules/dictionary-en-gb/index.aff",
+      "./node_modules/dictionary-en-gb/index.dic"
+    ]
+  },
   images: {
     remotePatterns: [{ protocol: "https", hostname: "images.unsplash.com" }]
   },
