@@ -4,7 +4,7 @@ import { loginSchema } from "@/lib/validators";
 import { verifyPassword } from "@/lib/password";
 import { createSession, dashboardPath } from "@/lib/auth";
 import { logSecurityEvent } from "@/lib/security-log";
-import { assertLoginAllowed } from "@/lib/rate-limit";
+import { assertLoginAllowed, LoginRateLimitError } from "@/lib/rate-limit";
 import { getClientInfo, safeRedirectPath } from "@/lib/utils";
 import { apiError } from "@/lib/api";
 import { isPrismaConnectionError, withPrismaConnectionRetry } from "@/lib/database-health";
@@ -53,13 +53,18 @@ export async function POST(request: Request) {
     await logSecurityEvent({ request, userId: user.id, action: "LOGIN_PASSWORD", status: "SUCCESS", metadata: { mfaRequired: false } });
     return NextResponse.json({ success: true, redirectTo });
   } catch (error) {
+    if (error instanceof LoginRateLimitError) {
+      return NextResponse.json(
+        { error: error.message, retryAfterSeconds: error.retryAfterSeconds },
+        { status: 429, headers: { "Cache-Control": "no-store", "Retry-After": String(error.retryAfterSeconds) } }
+      );
+    }
     await logSecurityEvent({ request, action: "LOGIN_PASSWORD", status: "FAILURE", metadata: { email } });
-    const rateLimited = error instanceof Error && error.message.includes("Too many failed login attempts");
     const databaseUnavailable = isPrismaConnectionError(error);
     return apiError(
       error,
-      rateLimited ? error.message : databaseUnavailable ? "Login service is temporarily unavailable. Please try again in a moment." : "Login failed",
-      rateLimited ? 429 : databaseUnavailable ? 503 : 400
+      databaseUnavailable ? "Login service is temporarily unavailable. Please try again in a moment." : "Login failed",
+      databaseUnavailable ? 503 : 400
     );
   }
 }

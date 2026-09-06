@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft, Fingerprint, LockKeyhole, Mail, ShieldCheck } from "lucide-react";
@@ -11,6 +11,12 @@ import { SubmitButton } from "@/components/ui/submit-button";
 import { Button } from "@/components/ui/button";
 import { Alert } from "@/components/ui/alert";
 
+function formatCountdown(seconds: number) {
+  const minutes = Math.floor(seconds / 60);
+  const remainingSeconds = seconds % 60;
+  return `${minutes}:${String(remainingSeconds).padStart(2, "0")}`;
+}
+
 export function LoginForm() {
   const search = useSearchParams();
   const [email, setEmail] = useState("");
@@ -20,11 +26,27 @@ export function LoginForm() {
   const [mfaChallenge, setMfaChallenge] = useState<string | null>(null);
   const [mfaCode, setMfaCode] = useState("");
   const [disabledAccount, setDisabledAccount] = useState(false);
+  const [retryAfterSeconds, setRetryAfterSeconds] = useState(0);
   const [message, setMessage] = useState<{ type: "error" | "success"; text: string } | null>(null);
   const redirectTo = search.get("redirectTo") || "/dashboard";
 
+  useEffect(() => {
+    if (retryAfterSeconds <= 0) return;
+    const timer = window.setInterval(() => {
+      setRetryAfterSeconds((seconds) => Math.max(0, seconds - 1));
+    }, 1000);
+    return () => window.clearInterval(timer);
+  }, [retryAfterSeconds]);
+
+  useEffect(() => {
+    if (retryAfterSeconds === 0 && message?.text === "Too many failed login attempts.") {
+      setMessage(null);
+    }
+  }, [message, retryAfterSeconds]);
+
   async function passwordLogin(event: React.FormEvent) {
     event.preventDefault();
+    if (retryAfterSeconds > 0) return;
     setLoading(true); setMessage(null); setDisabledAccount(false);
     try {
       const response = await fetch("/api/auth/login", {
@@ -33,6 +55,10 @@ export function LoginForm() {
       });
       const result = await response.json();
       if (!response.ok) {
+        if (response.status === 429 && typeof result.retryAfterSeconds === "number") {
+          setRetryAfterSeconds(Math.max(1, result.retryAfterSeconds));
+          return setMessage({ type: "error", text: result.error || "Too many failed login attempts." });
+        }
         setDisabledAccount(response.status === 403 && result.error === "This account has been disabled by an administrator.");
         return setMessage({ type: "error", text: result.error || "Login failed" });
       }
@@ -98,5 +124,5 @@ export function LoginForm() {
     return <form onSubmit={verifyMfa} className="space-y-5">{message ? <Alert variant={message.type}>{message.text}</Alert> : null}<div className="premium-card-subtle p-4"><div className="flex items-start gap-3"><span className="rounded-lg bg-primary/10 p-2 text-primary"><ShieldCheck className="h-5 w-5" /></span><div><p className="font-black text-[#12201c]">Authenticator verification</p><p className="mt-1 text-sm leading-6 text-muted-foreground">Enter the current 6-digit code for {email}. The code refreshes every 30 seconds.</p></div></div></div><div className="space-y-2"><Label htmlFor="mfa-code">Authenticator code</Label><Input id="mfa-code" inputMode="numeric" autoComplete="one-time-code" pattern="[0-9]{6}" maxLength={6} required value={mfaCode} onChange={(event)=>setMfaCode(event.target.value.replace(/\D/g, "").slice(0, 6))} className="text-center text-xl font-black tracking-[0.35em]" placeholder="000000" /></div><SubmitButton loading={loading} className="w-full">Verify and continue</SubmitButton><Button type="button" variant="ghost" className="w-full" onClick={()=>{setMfaChallenge(null);setMfaCode("");setMessage(null);}}><ArrowLeft className="h-4 w-4" />Use another account</Button></form>;
   }
 
-  return <div className="space-y-5">{message ? <Alert variant={message.type}><p>{message.text}</p>{disabledAccount?<Link href={`/contact?reason=disabled-account&email=${encodeURIComponent(email)}`} className="mt-2 inline-flex font-black underline underline-offset-2">Submit an account appeal</Link>:null}</Alert> : null}<form onSubmit={passwordLogin} className="space-y-4"><div className="space-y-2"><Label htmlFor="email">Email address</Label><div className="input-shell"><Mail /><Input id="email" type="email" autoComplete="username webauthn" required value={email} onChange={(e) => setEmail(e.target.value)} className="pl-9" placeholder="student@example.com" /></div></div><div className="space-y-2"><div className="flex items-center justify-between gap-3"><Label htmlFor="password">Password</Label><Link href="/forgot-password" className="text-xs font-black text-primary hover:underline">Forgot password?</Link></div><div className="input-shell"><LockKeyhole /><Input id="password" type="password" autoComplete="current-password" required value={password} onChange={(e) => setPassword(e.target.value)} className="pl-9" /></div></div><SubmitButton loading={loading} className="w-full">Login securely</SubmitButton></form><div className="relative"><div className="absolute inset-0 flex items-center"><span className="w-full border-t border-[#d8e5de]" /></div><div className="relative flex justify-center text-xs uppercase"><span className="bg-white px-2 font-black text-muted-foreground">or</span></div></div><Button type="button" variant="outline" className="w-full" disabled={passkeyLoading} onClick={passkeyLogin}><Fingerprint className="h-5 w-5 text-accent" />{passkeyLoading ? "Waiting for device verification..." : "Login with fingerprint/passkey"}</Button><p className="text-center text-xs leading-5 text-muted-foreground">Your device verifies your fingerprint. This platform never receives or stores it.</p></div>;
+  return <div className="space-y-5">{message ? <Alert variant={message.type}><p>{message.text}{retryAfterSeconds > 0 ? <> Try again in <strong aria-live="polite">{formatCountdown(retryAfterSeconds)}</strong>.</> : null}</p>{disabledAccount?<Link href={`/contact?reason=disabled-account&email=${encodeURIComponent(email)}`} className="mt-2 inline-flex font-black underline underline-offset-2">Submit an account appeal</Link>:null}</Alert> : null}<form onSubmit={passwordLogin} className="space-y-4"><div className="space-y-2"><Label htmlFor="email">Email address</Label><div className="input-shell"><Mail /><Input id="email" type="email" autoComplete="username webauthn" required value={email} onChange={(e) => setEmail(e.target.value)} className="pl-9" placeholder="student@example.com" /></div></div><div className="space-y-2"><div className="flex items-center justify-between gap-3"><Label htmlFor="password">Password</Label><Link href="/forgot-password" className="text-xs font-black text-primary hover:underline">Forgot password?</Link></div><div className="input-shell"><LockKeyhole /><Input id="password" type="password" autoComplete="current-password" required value={password} onChange={(e) => setPassword(e.target.value)} className="pl-9" /></div></div><SubmitButton loading={loading} disabled={retryAfterSeconds > 0} className="w-full">{retryAfterSeconds > 0 ? `Try again in ${formatCountdown(retryAfterSeconds)}` : "Login securely"}</SubmitButton></form><div className="relative"><div className="absolute inset-0 flex items-center"><span className="w-full border-t border-[#d8e5de]" /></div><div className="relative flex justify-center text-xs uppercase"><span className="bg-white px-2 font-black text-muted-foreground">or</span></div></div><Button type="button" variant="outline" className="w-full" disabled={passkeyLoading} onClick={passkeyLogin}><Fingerprint className="h-5 w-5 text-accent" />{passkeyLoading ? "Waiting for device verification..." : "Login with fingerprint/passkey"}</Button><p className="text-center text-xs leading-5 text-muted-foreground">Your device verifies your fingerprint. This platform never receives or stores it.</p></div>;
 }
