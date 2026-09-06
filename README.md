@@ -216,7 +216,7 @@ Open `http://localhost:3000`.
 
 | Role | Name | Email | Password |
 |---|---|---|---|
-| Admin | Olalekan Ayomide David | `Olalekanayomide12111@gmail.com` | `CSC/2022/81197` |
+| Admin | Olalekan Ayomide David | `olalekanayomide12111@gmail.com` | `CSC/2022/81197` |
 | Lecturer | Dr Grace Okafor | `lecturer@securelearn.test` | `Password123!` |
 | Student | Ada Nwosu | `student@securelearn.test` | `Password123!` |
 

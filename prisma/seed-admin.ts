@@ -11,7 +11,7 @@ async function main() {
         where: { id: existingAdmin.id },
         data: {
           name: "Olalekan Ayomide David",
-          email: "Olalekanayomide12111@gmail.com",
+          email: "olalekanayomide12111@gmail.com",
           passwordHash,
           role: "ADMIN",
           isActive: true
@@ -21,7 +21,7 @@ async function main() {
     : await prisma.user.create({
         data: {
           name: "Olalekan Ayomide David",
-          email: "Olalekanayomide12111@gmail.com",
+          email: "olalekanayomide12111@gmail.com",
           passwordHash,
           role: "ADMIN"
         },

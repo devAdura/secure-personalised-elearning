@@ -17,7 +17,7 @@ export async function POST(request: Request) {
     email = input.email;
     const { ipAddress } = getClientInfo(request);
     await assertLoginAllowed(ipAddress);
-    const user = await withPrismaConnectionRetry(() => db.user.findUnique({ where: { email: input.email }, select: { id: true, email: true, passwordHash: true, role: true, isActive: true, totpEnabled: true, totpSecretEncrypted: true } }));
+    const user = await withPrismaConnectionRetry(() => db.user.findFirst({ where: { email: { equals: input.email, mode: "insensitive" } }, select: { id: true, email: true, passwordHash: true, role: true, isActive: true, totpEnabled: true, totpSecretEncrypted: true } }));
     if (!user || !(await verifyPassword(input.password, user.passwordHash))) {
       await logSecurityEvent({ request, userId: user?.id, action: "LOGIN_PASSWORD", status: "FAILURE", metadata: { email } });
       return NextResponse.json({ error: "Invalid email or password." }, { status: 401 });

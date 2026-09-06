@@ -25,7 +25,7 @@ async function main() {
     bcrypt.hash("Password123!", 12)
   ]);
   const [admin, lecturer, lecturerTwo, student, studentTwo] = await Promise.all([
-    prisma.user.create({ data: { name: "Olalekan Ayomide David", email: "Olalekanayomide12111@gmail.com", passwordHash: adminPasswordHash, role: "ADMIN" } }),
+    prisma.user.create({ data: { name: "Olalekan Ayomide David", email: "olalekanayomide12111@gmail.com", passwordHash: adminPasswordHash, role: "ADMIN" } }),
     prisma.user.create({ data: { name: "Dr Grace Okafor", email: "lecturer@securelearn.test", passwordHash, role: "LECTURER" } }),
     prisma.user.create({ data: { name: "Mr David Bello", email: "david@securelearn.test", passwordHash, role: "LECTURER" } }),
     prisma.user.create({ data: { name: "Ada Nwosu", email: "student@securelearn.test", passwordHash, role: "STUDENT" } }),
@@ -124,7 +124,7 @@ async function main() {
 
   console.log("Seed complete.");
   console.log("Student and lecturer demo password: Password123!");
-  console.log("Admin: Olalekan Ayomide David <Olalekanayomide12111@gmail.com>");
+  console.log("Admin: Olalekan Ayomide David <olalekanayomide12111@gmail.com>");
   console.log("Lecturer: lecturer@securelearn.test");
   console.log("Student: student@securelearn.test");
 }

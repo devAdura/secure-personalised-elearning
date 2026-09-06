@@ -23,7 +23,7 @@ export async function POST(request: Request) {
     const { email } = passwordResetRequestSchema.parse(await request.json());
     if (!isRecoveryEmailConfigured()) {
       return NextResponse.json(
-        { error: "Password recovery email is temporarily unavailable. Please contact Olalekanayomide12111@gmail.com for help." },
+        { error: "Password recovery email is temporarily unavailable. Please contact olalekanayomide12111@gmail.com for help." },
         { status: 503 }
       );
     }
@@ -73,7 +73,7 @@ export async function POST(request: Request) {
       await logSecurityEvent({ request, userId: user.id, action: "PASSWORD_RESET_EMAIL", status: "FAILURE" });
       console.error("Password reset email delivery failed", error);
       return NextResponse.json(
-        { error: "The reset email could not be sent. Please try again shortly or contact Olalekanayomide12111@gmail.com." },
+        { error: "The reset email could not be sent. Please try again shortly or contact olalekanayomide12111@gmail.com." },
         { status: 503 }
       );
     }

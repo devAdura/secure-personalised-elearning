@@ -26,7 +26,7 @@ async function main() {
   await prisma.user.create({
     data: {
       name: "System Administrator",
-      email: "Olalekanayomide12111@gmail.com",
+      email: "olalekanayomide12111@gmail.com",
       passwordHash,
       role: Role.ADMIN,
       isActive: true,
@@ -35,7 +35,7 @@ async function main() {
 
   console.log("Production database cleaned successfully.");
   console.log("New admin account created:");
-  console.log("Email: Olalekanayomide12111@gmail.com");
+  console.log("Email: olalekanayomide12111@gmail.com");
   console.log("Password: AdminSecure123!");
 }
 
