@@ -21,10 +21,13 @@ export function isPrismaConnectionError(error: unknown) {
     code === "P1000" ||
     code === "P1001" ||
     code === "P1002" ||
+    code === "P1003" ||
     code === "P1008" ||
     code === "P1012" ||
     code === "P1017" ||
-    /Can't reach database server|ECONNREFUSED|connect ECONNREFUSED|connection refused|ETIMEDOUT|ECONNRESET|Connection terminated|Environment variable not found|DATABASE_URL|DIRECT_URL/i.test(message)
+    code === "P2024" ||
+    code === "P2037" ||
+    /Can't reach database server|Tenant or user not found|Timed out fetching a new connection|ENOTFOUND|EAI_AGAIN|ECONNREFUSED|connect ECONNREFUSED|connection refused|ETIMEDOUT|ECONNRESET|Connection terminated|Environment variable not found|DATABASE_URL|DIRECT_URL/i.test(message)
   );
 }
 

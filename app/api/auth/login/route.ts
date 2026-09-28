@@ -63,7 +63,7 @@ export async function POST(request: Request) {
     const databaseUnavailable = isPrismaConnectionError(error);
     return apiError(
       error,
-      databaseUnavailable ? "Login service is temporarily unavailable. Please try again in a moment." : "Login failed",
+      databaseUnavailable ? "Login is temporarily unavailable. Please try again later." : "Login failed",
       databaseUnavailable ? 503 : 400
     );
   }
